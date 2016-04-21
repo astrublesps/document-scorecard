@@ -1,0 +1,24 @@
+<div class="row">
+  <spsui-feedback-container feedback-id="myMessages"></spsui-feedback-container>
+  <div class="row">
+    <div class="small-16 large-8 columns panel toolbar" ng-include="'views/leftToolBar.html'">
+    </div>
+    <div class="large-7 columns panel toolbar hide-for-medium hide-for-small" ng-include="'views/rightToolBar.html'">
+    </div>
+  </div>
+  <div class="row">
+    <div class="small-16 large-8 columns panel condensed" ng-include="'views/scenariosTable.html'">
+    </div>
+    <div class="large-1 small-16 columns panel toolbar hide-for-large hide-for-xlarge hide-for-xxlarge" ng-include="'views/rightToolBar.html'">
+    </div>
+    <div class="large-7 columns panel condensed table">
+    <div ng-hide="hideESPS" ng-include="'views/espsTable.html'">
+    </div>
+    <div ng-hide="hideTestTable" ng-include="'views/scenariosTestTable.html'">
+    </div>
+    </div>
+  </div>
+</div>
+<div>
+  <ui-view></ui-view>
+</div>

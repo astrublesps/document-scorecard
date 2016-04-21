@@ -1,0 +1,8 @@
+flask/
+__pycache__/
+.idea/
+*.iml
+ALL_UPLOADS/
+dsc_log/
+application/app/static/bower_components/
+node_modules/

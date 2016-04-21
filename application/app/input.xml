@@ -1,0 +1,71 @@
+<Order>
+  <Header>
+    <OrderHeader>
+      <TradingPartnerId>SPSALLPROPERFOR</TradingPartnerId>
+      <PurchaseOrderNumber>PO856953</PurchaseOrderNumber>
+      <TsetPurposeCode>00</TsetPurposeCode>
+      <PurchaseOrderTypeCode>SA</PurchaseOrderTypeCode>
+      <POTypeDescription>Stand Alone Order</POTypeDescription>
+      <ReleaseNumber>48</ReleaseNumber>
+      <PurchaseOrderDate>2015-10-16</PurchaseOrderDate>
+      <PurchaseOrderTime>08:00:00</PurchaseOrderTime>
+      <ShipCompleteCode>Y</ShipCompleteCode>
+      <BuyersCurrency>USD</BuyersCurrency>
+      <Department>SPS</Department>
+      <Vendor>016581</Vendor>
+      <Division>019</Division>
+      <PromotionDealNumber>98698689</PromotionDealNumber>
+    </OrderHeader>
+    <Date>
+      <DateTimeQualifier1>037</DateTimeQualifier1>
+      <Date1>2015-10-18</Date1>
+      <Time1>10:04:41</Time1>
+    </Date>
+    <Date>
+      <DateTimeQualifier1>038</DateTimeQualifier1>
+      <Date1>2015-10-22</Date1>
+      <Time1>10:04:41</Time1>
+    </Date>
+    <Contact>
+      <ContactTypeCode>BD</ContactTypeCode>
+      <ContactName>SPS Commerce Buyer</ContactName>
+      <PrimaryPhone>612-435-9400</PrimaryPhone>
+      <PrimaryFax>612-435-9468</PrimaryFax>
+      <PrimaryEmail>buyer@spscommerce.com</PrimaryEmail>
+    </Contact>
+    <Address>
+      <AddressTypeCode>ST</AddressTypeCode>
+      <LocationCodeQualifier>92</LocationCodeQualifier>
+      <AddressLocationNumber>820</AddressLocationNumber>
+      <AddressName>SPS Commerce Distribution Center</AddressName>
+      <AddressAlternateName>DC 123</AddressAlternateName>
+      <Address1>333 S 7th Street</Address1>
+      <Address2>Suite 1000</Address2>
+      <City>Minneapolis</City>
+      <State>MN</State>
+      <PostalCode>55402</PostalCode>
+      <Country>USA</Country>
+    </Address>
+    <CarrierInformation>
+      <CarrierTransMethodCode>M</CarrierTransMethodCode>
+      <CarrierAlphaCode>MESY</CarrierAlphaCode>
+      <CarrierRouting>Ontrac</CarrierRouting>
+    </CarrierInformation>
+    <Reference>
+      <ReferenceQual>GK</ReferenceQual>
+      <ReferenceID>UPS5987-1</ReferenceID>
+      <Description>UPS Billing Account Number</Description>
+    </Reference>
+    <Notes>
+      <NoteCode>GEN</NoteCode>
+      <NoteInformationField>PRODUCT MUST BE SHIPPED ON PALLETS AND SHRINK WRAPPED</NoteInformationField>
+    </Notes>
+    <ChargesAllowances>
+      <AllowChrgIndicator>C</AllowChrgIndicator>
+      <AllowChrgCode>D240</AllowChrgCode>
+      <AllowChrgAmt>5</AllowChrgAmt>
+      <AllowChrgHandlingCode>02</AllowChrgHandlingCode>
+      <AllowChrgHandlingDescription>Freight Charge</AllowChrgHandlingDescription>
+    </ChargesAllowances>
+  </Header>
+</Order>

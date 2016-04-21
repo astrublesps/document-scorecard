@@ -1,0 +1,46 @@
+<html ng-app="myApp">
+  <head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+    <link href="bower_components/webui-core/dist/webui-core.min.css" rel="stylesheet">
+    <link href="bower_components/webui-feedback/dist/bundle.min.css" rel="stylesheet">
+
+    <script src="bower_components/jquery/dist/jquery.min.js"></script>
+    <script src="bower_components/angular/angular.min.js"></script>
+    <script src="bower_components/angular-route/angular-route.min.js"></script>
+    <script src="bower_components/lodash/lodash.min.js"></script>
+    <script src="bower_components/webui-core/dist/webui-core.min.js"></script>
+    <script src="bower_components/webui-feedback/dist/bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/angular.ui-router/0.2.11/angular-ui-router.js"></script>
+    <script src="https://angular-ui.github.io/bootstrap/ui-bootstrap-tpls-0.14.1.js"></script>
+    <script type="text/javascript" src="app.js"></script>
+    <script type="text/javascript" src="controllers/modalCtrl.js"></script>
+    <script type="text/javascript" src="controllers/scenariosCtrl.js"></script>
+    <script type="text/javascript" src="controllers/testCtrl.js"></script>
+    <script type="text/javascript" src="factories/scenariosFactory.js"></script>
+    <script type="text/javascript" src="factories/espsFactory.js"></script>
+    <script type="text/javascript" src="services/feedbackService.js"></script>
+    <script type="text/javascript" src="directives/dragDrop.directive.js"></script>
+    <link rel="stylesheet" type="text/css" href="styles/DSC_Styles.css" />
+  </head>
+  <body>
+    <spsui-application mode="centered">
+        <nav class="top-bar">
+            <ul class="title-area">
+              <li class="name">
+                  <img src="logo-header@2x.png" alt="SPS logo" style="max-width: 50%"/>
+              </li>
+            </ul>
+              <ul>
+                <li>
+                  <h1 style="color: white; font-size: 1.625rem">Document Score Card</h1>
+                </li>
+              </ul>
+        </nav>
+      <spsui-viewport>
+        <ui-view>
+        </ui-view>
+      </spsui-viewport>
+    </spsui-application>
+  </body>
+</html>

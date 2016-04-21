@@ -1,0 +1,25 @@
+<div id="delete-modal" name="deleteModal" class="reveal-modal delete open" tabindex="0" aria-hidden="false" style="display: block; opacity: 1; visibility: visible; top: 100px; max-height: 500px; width: auto">
+  <header class="modal-title">
+    Confirm ESP removal
+  </header>
+  <ul class="fa-ul">
+    <li>
+      <i class="fa-li fa fa-ban error-corror fa-lg"></i>
+      Are you sure you want to delete <strong>{[ scenario.xpath ]}</strong>?
+    </li>
+  </ul>
+  <ul class="form-actions">
+    <li class="msg">
+      <strong>Fair warning:</strong> this cannot be undone.
+    </li>
+    <li>
+      <button class="button" ng-click="cancelModal()">Cancel</button>
+    </li>
+    <li>
+      <button class="delete" ng-click="closeModal()">
+        Finish
+      </button>
+    </li>
+  </ul>
+  <a class="close-reveal-modal" ng-click="cancelModal()">x</a>
+</div>

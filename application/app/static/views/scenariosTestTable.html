@@ -1,0 +1,43 @@
+<table class="table">
+ <thead>
+   <tr>
+     <th width="5%" class="txt-center">
+     </th>
+     <th width="25%" class="sortable" ng-click="checkSort('Name')" ng-class="{active: sortColumn == 'Name'}">
+       Name
+     </th>
+     <th width="18%" class="sortable" ng-hide="hideDocType" ng-click="checkSort('DocumentType')" ng-class="{active: sortColumn == 'DocumentType'}">
+       Doc Type
+     </th>
+     <th width="13%" class="sortable hide-for-small" title="created date" ng-hide="hideDateCreated" ng-click="checkSort('DateCreated')" ng-class="{active: sortColumn == 'DateCreated'}">
+       Created
+     </th>
+     <th width="14%" class="sortable" title="last modified date" ng-hide="hideDateModified" ng-click="checkSort('LastModified')" ng-class="{active: sortColumn == 'LastModified'}">
+       Modified
+     </th>
+   </tr>
+ </thead>
+ <tbody>
+    <tr ng-repeat="scenario in scenariosTestList | filter: scenarioFilter.filter | orderBy: sortColumn : reverse"
+        id="{[ scenario.name ]}" title="{[ scenario.description ]}">
+        <td>
+           <a class="no-border" title="add scenario to test" ng-hide="hideAddTest" ng-click="removedFromList(scenario)">
+             <i class="fa fa-remove fa-lg"></i>
+           </a>
+        </td>
+        <td>{[ scenario.name ]}</td>
+        <td class="txt-center" ng-hide="hideDocType">{[ scenario.doctype ]}</td>
+        <td class="hide-for-small" ng-hide="hideDateCreated">{[ scenario.date_created ]}</td>
+        <td ng-hide="hideDateModified">{[ scenario.date_updated ]}</td>
+    </tr>
+ </tbody>
+</table>
+<ul class="disc" ng-hide="scenariosTestList != ''">
+   <h4>To run a test:</h4>
+   <li>
+      <span><h5>Add scenario(s) using (  <i class="fa fa-level-up fa-lg fa-rotate-90"></i>  )</h5></span>
+   </li>
+   <li>
+      <span><h5>Upload a test using (  <i class="fa fa-cloud-upload fa-lg"></i>  )</h5></span>
+   </li>
+</ul>

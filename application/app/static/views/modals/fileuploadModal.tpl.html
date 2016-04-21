@@ -1,0 +1,39 @@
+<div id="fileupload-modal" class="reveal-modal open" data-reveal tabindex="0" aria-hidden="false" style="display: block; opacity: 1; visibility: visible; top: 100px; max-height: 500px; width: auto">
+  <header class="modal-title">
+    Upload test file
+  </header>
+  <ul class="fa-ul">
+    <li>
+      <div class="droparea" drag-drop>
+        <div class="row">
+          <input type="file" ng-model-instant id="fileToUpload" onchange="angular.element(this).scope().setFiles(this)" />
+        </div>
+        <div id="dropbox" ng-hide="files.length" class="dropbox" ><span>{[dropText]}</span></div>
+        <div ng-show="files.length">
+            <div ng-repeat="file in files.slice(0)">
+                <span>{[file.webkitRelativePath || file.name]}</span>
+                (<span ng-switch="file.size > 1024*1024">
+                    <span ng-switch-when="true">{[file.size / 1024 / 1024 | number:2]} MB</span>
+                    <span ng-switch-default>{[file.size / 1024 | number:2]} kB</span>
+                </span>)
+            </div>
+        </div>
+      </div>
+      <span style="font-size: .8em"><strong>Note</strong>: Do not upload a file if you wish to create a blank scenario</span>
+    </li>
+  </ul>
+  <ul class="form-actions">
+    <li class="msg">
+      <strong>Fair warning:</strong> this cannot be undone, only deleted.
+    </li>
+    <li>
+      <button class="button" ng-click="cancelModal()">Cancel</button>
+    </li>
+    <li>
+      <button ng-click="closeModal()" class="confirm" ng-disabled="">
+      Continue
+    </button>
+    </li>
+  </ul>
+  <a class="close-reveal-modal" ng-click="cancelModal()">x</a>
+</div>

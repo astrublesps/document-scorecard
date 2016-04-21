@@ -1,0 +1,12 @@
+.modal-open {
+  width:400px; height: 400px;
+}
+
+table {
+    padding-top: 5px;
+    overflow-y: auto;
+    overflow-x: auto;
+    max-height: 275px;
+    table-layout: fixed;
+    word-wrap: break-word;
+}

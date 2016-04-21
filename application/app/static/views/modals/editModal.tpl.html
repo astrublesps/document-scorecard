@@ -1,0 +1,40 @@
+<div id="edit-modal" name="editModal" class="reveal-modal warning open" tabindex="0" aria-hidden="false" style="display: block; opacity: 1; visibility: visible; top: 100px; max-height: 500px; width: auto">
+  <header class="modal-title">
+    edit a scenario
+  </header>
+  Editing scenario '{[ scenario.name ]}'
+  <ul class="fa-ul">
+    <li>
+      <div>
+        <label class="required">
+          Scenario
+          <input type="text" autofocus placeHolder="enter a new scenario name..."
+           ng-model="newScenario.name"
+          >
+        </label>
+      </div>
+      <div>
+        <label class="required">
+          Description
+          <input type="text" placeHolder="enter a new description..."
+           ng-model="newScenario.description"
+          >
+        </label>
+      </div>
+    </li>
+  </ul>
+  <ul class="form-actions">
+    <li class="msg">
+      <strong>Fair warning:</strong> this cannot be undone, but re-edited.
+    </li>
+    <li>
+      <button class="button" ng-click="cancelModal()">Cancel</button>
+    </li>
+    <li>
+      <button class="confirm" ng-click="closeModal()" ng-disabled="!newScenario.name || !newScenario.description">
+        Finish
+      </button>
+    </li>
+  </ul>
+  <a class="close-reveal-modal" ng-click="cancelModal()">x</a>
+</div>

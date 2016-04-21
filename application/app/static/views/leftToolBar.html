@@ -1,0 +1,29 @@
+<div class="col-xs-6">
+  <div class="input-group input-group-sm">
+    <span class="input-group-addon" bs-icon="search">
+      <span class="glyphicon glyphicon-search"></span>
+    </span>
+    <input type="search" id="scenarioFilter" class="file-browser-search form-control" placeholder="Filter scenarios..."
+      ng-model="scenarioFilter.filter" autofocus/>
+    <span class="input-group-addon pointer-cursor" ng-click="scenarioFilter.filter = ''" title="Clear filter" bs-icon="remove">
+      <span class="glyphicon glyphicon-remove"></span>
+    </span>
+  </div>
+</div>
+<div class="col-xs-5">
+  <div class="input-group input-group-sm" ng-hide="hideCreate">
+    <span>
+      <button class="button" ng-click="openModal('create', '')" title="Create a new scenario">
+        <i class="fa fa-plus"></i>
+         Create Scenario
+      </button>
+    </span>
+  </div>
+</div>
+<div class="toolbar-right">
+  <span class="table-actions">
+    <a href class="button no-border" title="future enhancement placeholder ;)">
+      <i class="fa fa-columns fa-20"></i>
+    </a>
+  </span>
+</div>

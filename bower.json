@@ -1,0 +1,24 @@
+{
+  "name": "dc4-search",
+  "description": "Search for company info on DC4.",
+  "main": "",
+  "authors": [
+    "Integrated Engineering"
+  ],
+  "license": "ISC",
+  "moduleType": [],
+  "homepage": "",
+  "private": true,
+  "dependencies": {
+    "angular": "1.4.8",
+    "angular-route": "1.4.8",
+    "webui-core": "git@github.com:SPSCommerce/webui-core.git"
+  },
+  "devDependencies": {
+    "ui-bootstrap": "^1.2.5",
+    "angular-bootstrap": "^1.2.5",
+    "angular-ui-router": "^0.2.18",
+    "angular-upload": "^1.0.12",
+    "webui-feedback": "git@github.com:SPSCommerce/webui-feedback.git#^1.0.6"
+  }
+}
