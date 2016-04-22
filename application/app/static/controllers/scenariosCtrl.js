@@ -8,7 +8,7 @@ angular.module("myApp").controller("scenariosCtrl",  scenariosCtrl);
         $scope.selectedScenario = [];
         $scope.scenarioFilter = {filter: ''};
         $scope.espFilter = {filter: ''};
-        $scope.reverse = true;
+        $scope.reverse = false;
 
         //hide buttons and columns for this view
         $scope.hideTestButton = true;

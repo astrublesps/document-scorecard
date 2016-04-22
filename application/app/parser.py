@@ -51,7 +51,8 @@ class Parser:
             is_qualified_rep, q_index = Parser.check_qual(list(parent_node))
             has_equivalents,e_index = Parser.check_equivalents(list(parent_node))
             if is_qualified_rep and has_equivalents:#can't handle this eventuality yet
-                print("both")
+                key2, quals2 = Parser.process_qual_rep(Parser.check_required_data(Parser.tree.getpath(parent_node[q_index]), parent_node[q_index].text),Parser.check_required_data(Parser.tree.getpath(parent_node[e_index]), parent_node[e_index].text), parent_node[q_index].itersiblings())
+                Parser.qualified_reps[key2] = quals2
             elif is_qualified_rep:
                 key, quals = Parser.process_qual_rep(Parser.check_required_data(Parser.tree.getpath(parent_node[q_index]), parent_node[q_index].text), parent_node[q_index].itersiblings())
                 Parser.qualified_reps[key] = quals
@@ -84,7 +85,7 @@ class Parser:
                 return True, e.getparent().index(e)
         return False,-1
 
-    #method for getting the paths of equivalent fields and adding them to a special list to be
+    #method for getting the paths of equivalent fields and adding them to a special list
     #to be processed when the scenario is created
     #parameters: string xpath, list of etree nodes
     def process_equivalents(initial_xpath, siblings):
@@ -132,31 +133,27 @@ class Parser:
         return key, required_fields
 
     #not a working method yet
-    def process_qual_rep_and_equivalents(first_qualifier, siblings):
-        processed = []
-        group_equals = []
+    def process_qual_rep_and_equivalents(first_qualifier, initial_xpath, siblings):
         first = first_qualifier
-        first.append(True)
-        processed.append(first)
-        for sibling in siblings:
-            is_a_qualifier = False
-            if '%%%' or '[qualified rep]' in sibling.text:
-                if '%%%' and '[qualified rep]' in sibling.text:
-                    for equal in equals:
-                        group_equals.append(equal)
-                elif '%%%' in sibling.text:
-                    x=1
-                else:
+        first['is_qual']=True
+        key = first['xpath'] + first['data']
+        required_fields = []
+        if first not in required_fields:
+            required_fields.append(first)
+        #elements are the siblings of the qualifier, eg if qualifier is addressTypeCode, elements would contain Address1, City, State, Zip, etc.
+        for e in elements:
+            if len(e) < 1:
+                is_a_qualifier = False
+                field = Parser.check_required_data(Parser.tree.getpath(e), e.text)
+                if '[qualified rep]' in e.text:
                     is_a_qualifier = True
+                field['is_qual']=is_a_qualifier
+                required_fields.append(field)
+            #if a qualified rep contains a nested group, process it as required within the qualified rep (nested qualifiers)
             else:
-                rep_required_field = Parser.check_required_data(Parser.tree.getpath(sibling), sibling.text)
-                rep_required_field['is_qual']=is_a_qualifier
-                processed.append(rep_required_field)
-        groups = {}
-        groups['qual_fields'] = processed
-        groups['equals'] = group_equals
-        return groups
-
+                required_fields.extend(Parser.process_qual_rep(first, e.getchildren())[1])
+            e.attrib['visited']='yes'
+                                                                                                                                                                                                                                                           
     #helper method to take in individual fields/leaves and give back a dict with the field's xpath, score,
     # and required data
     #parameters: string xpath, string node.text

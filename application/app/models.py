@@ -40,8 +40,8 @@ qual_children = db.Table('qual_children',
 class ESP(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     score = db.Column(db.Integer)
-    data = db.Column(db.String(30))
-    xpath = db.Column(db.String(250), index=True)
+    data = db.Column(db.String(300))
+    xpath = db.Column(db.String(500), index=True)
     is_qual = db.Column(db.Boolean)
     equal_elements = db.relationship('ESP',
                                      secondary = esp_groups,

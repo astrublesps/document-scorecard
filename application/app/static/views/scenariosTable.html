@@ -1,7 +1,7 @@
 <table class="table">
  <thead>
    <tr>
-     <th width="5%" class="txt-center">
+     <th width="5%" class="txt-center" ng-hide="hideCheckBox">
      </th>
      <th width="30%" class="sortable" ng-click="checkSort('Name')" ng-class="{active: sortColumn == 'Name'}">
        Name
@@ -24,7 +24,7 @@
     <tr ng-repeat="scenario in scenarios | filter: scenarioFilter.filter | orderBy: sortColumn : reverse"
         id="{[ scenario.name ]}" title="{[ scenario.description ]}"
              ng-class="{selected : scenario.isChecked}">
-        <td>
+        <td ng-hide="hideCheckBox">
           <input id="checkbox-{[scenario.name]}" stop-event type="checkbox"
           ng-model="scenario.isChecked" ng-click="setSelectedScenario(scenario); scenarioFilter = scenario.name"
           ng-true-value="true" ng-false-value="false">

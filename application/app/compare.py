@@ -21,10 +21,10 @@ class Compare:
         #for x in input_list:
         #    print(x)
         for esp_ in esps:
-            print('top '+esp_.xpath+ ' ' +str(possible_score))
+            #print('top '+esp_.xpath+ ' ' +str(possible_score))
             if esp_ in skips:
                 continue
-            print(esp_.xpath)
+            #print(esp_.xpath)
             #if multiple fields can fulfill the same role, such as BPN/UPC/VPN, check for them
             if esp_.has_equals() or esp_.is_qualifier():
                 if esp_.has_equals():
@@ -36,7 +36,7 @@ class Compare:
                     for g in input_groups:
                         input_has_an_equal = False
                         possible_score += esp_.score
-                        print('equivalent '+esp_.xpath+ ' ' +str(possible_score))
+                        #print('equivalent '+esp_.xpath+ ' ' +str(possible_score))
                         for equal in equals:
                             if g.find(Compare.get_field(equal.xpath)) is not None:
                                 if check_data and (esp_.data is None or  len(esp_.data) < 1 or esp_.data in input_list[equal.xpath]):
@@ -68,12 +68,12 @@ class Compare:
                         missing_quals.extend(other_qual)
                         stop = True
                     if not stop:
-                        print('check_qual '+esp_.xpath+ ' ' +str(possible_score))
+                        #print('check_qual '+esp_.xpath+ ' ' +str(possible_score))
                         for qual in other_qual:
                             quals_present_score += qual.score
-                            print('qual_pres '+qual.xpath+ ' ' +str(quals_present_score))
+                         #   print('qual_pres '+qual.xpath+ ' ' +str(quals_present_score))
                             check_qual=parent.find(re.sub(Compare.get_containing_group(esp_.xpath)+'/', "", qual.xpath))
-                            print(esp_.xpath + " qual " + qual.xpath + " " + str(check_qual))
+                          #  print(esp_.xpath + " qual " + qual.xpath + " " + str(check_qual))
                             if check_qual is None or check_qual.text!=qual.data:
                                 missing_quals.append(qual)
                                 stop = True
@@ -82,7 +82,7 @@ class Compare:
                             for child in qual_children:
                                 if not child.is_qualifier():
                                     possible_score+=child.score
-                                    print('child '+child.xpath+ ' ' +str(possible_score))
+                           #         print('child '+child.xpath+ ' ' +str(possible_score))
                                     if parent.find(re.sub(Compare.get_containing_group(esp_.xpath)+'/', "", child.xpath)) is None:
                                         field = ("%s Rep [%s] is missing field %s %s %s" % (Compare.get_containing_group(esp_.xpath), quals_label,  child.xpath, "" if len(child.data) < 1 else "[%s]"%child.data, str(child.score)))
                                         failed_check_list.append(field)
@@ -92,11 +92,11 @@ class Compare:
                         group_score = 0
                         for qual in other_qual:
                             group_score += qual.score
-                            print('stop qual '+qual.xpath+ ' ' +str(group_score))
+                            #print('stop qual '+qual.xpath+ ' ' +str(group_score))
                         for child in qual_children:
                             if not child.is_qualifier():
                                 group_score += child.score
-                                #rint('stop child '+child.xpath+ ' ' +str(group_score))
+                                #print('stop child '+child.xpath+ ' ' +str(group_score))
                         field = ("Missing qualified repetition: %s where %s %s" %  (qual_group, quals_label, group_score)) 
                         failed_check_list.append(field)
                         score += group_score
@@ -104,7 +104,7 @@ class Compare:
                         
             else:
                 possible_score += esp_.score
-                print('bottom '+esp_.xpath+ ' ' +str(possible_score))
+                #print('bottom '+esp_.xpath+ ' ' +str(possible_score))
                 if esp_.xpath not in input_list.keys():
                     failed_check_list.append(esp_.xpath + " " + str(esp_.score))
                     score += esp_.score

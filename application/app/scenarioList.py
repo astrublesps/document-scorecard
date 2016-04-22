@@ -148,6 +148,16 @@ class ScenarioList:
                         if child is None:
                             child = models.ESP(qual_child['xpath'],qual_child['score'],qual_child['data'], qual_child['is_qual'])
                         qual_field.add_child(child)
+                        if 'has_qual' in qual_child:
+                            eq = qual_child['equals']
+                            for e in equals:
+                                x = scenario.get_single_esp_for_scen(equals['xpath'],equals['score'],equals['data'])
+                                if x is None:
+                                    x = models.ESP(equals['xpath'],equals['score'],equals['data'])
+                                if not child.equal_relationship_exists(x):
+                                    child.add_equal_element(x)
+                                if not x.equal_relationship_exists(child):
+                                    x.add_equal_element(child)
                     scen_test = models.Scenario.get_scenario(name)
                 scen_test = models.Scenario.get_scenario(name)
                 if len(edited_xpath_scores) > 0:

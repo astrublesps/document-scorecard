@@ -6,7 +6,7 @@ angular.module("myApp").controller("testCtrl",  testCtrl);
         $scope.scenarios = [];
         $scope.selectedScenario = [];
         $scope.scenariosTestList = [];
-        $scope.scenarioFilter = "";
+        $scope.scenarioFilter = {filter: ''};
         $scope.fileUploaded = false;
         $scope.reverse = true;
         $scope.fd = new FormData();
@@ -22,6 +22,7 @@ angular.module("myApp").controller("testCtrl",  testCtrl);
         $scope.hideRightSearch = true;
         $scope.hideCreate = true;
         $scope.hideESPS = true;
+        $scope.hideCheckBox = true;
 
         //Initially loads the table of scenarios
         scenariosFactory.getScenarioList().success(function (data) {
