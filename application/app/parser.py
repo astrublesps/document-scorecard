@@ -31,6 +31,8 @@ class Parser:
         # in order to accomplish this, give each node a "visited" attribute before processing starts
         for n in Parser.tree.iter():
             attributes = n.attrib
+            if attributes:
+                print(attributes)
             attributes['visited'] = 'no'
 
         nodes = Parser.tree.iter()
@@ -153,7 +155,7 @@ class Parser:
             else:
                 required_fields.extend(Parser.process_qual_rep(first, e.getchildren())[1])
             e.attrib['visited']='yes'
-                                                                                                                                                                                                                                                           
+
     #helper method to take in individual fields/leaves and give back a dict with the field's xpath, score,
     # and required data
     #parameters: string xpath, string node.text
