@@ -1,7 +1,7 @@
 angular.module("myApp").controller("scenariosCtrl",  scenariosCtrl);
 
-    scenariosCtrl.$inject = ["$scope", "scenariosFactory", "espsFactory", "feedbackService", "$uibModal"];
-    function scenariosCtrl($scope, scenariosFactory, espsFactory, feedbackService, $uibModal) {
+    scenariosCtrl.$inject = ["$scope", "scenariosFactory", "espsFactory", "schemasFactory", "feedbackService", "$uibModal"];
+    function scenariosCtrl($scope, scenariosFactory, espsFactory, schemasFactory, feedbackService, $uibModal) {
         //initiate local variables for tableCtrl
         $scope.scenarios = [];
         $scope.esps = [];
@@ -19,6 +19,11 @@ angular.module("myApp").controller("scenariosCtrl",  scenariosCtrl);
         //Initially loads the table of scenarios
         scenariosFactory.getScenarioList().success(function (data) {
             $scope.scenarios = data;
+        });
+
+        schemasFactory.getSchemaList().success(function (data) {
+            $scope.schemas = data;
+            console.log($scope.schemas);
         });
 
         //opens the scenario and ESP modal windows and performs the confirmed action when it closes
@@ -49,6 +54,8 @@ angular.module("myApp").controller("scenariosCtrl",  scenariosCtrl);
                             return scenario;
                         }, action: function() {
                             return action;
+                        }, schemas: function() {
+                            return $scope.schemas;
                         }
                     }
                 })
@@ -209,4 +216,59 @@ angular.module("myApp").controller("scenariosCtrl",  scenariosCtrl);
                 $scope.esps = []; // clears esp table if no scenario is selected
             };
         };
+
+        //schema functionality--------------------------------------------------
+        $scope.openSchemaModal = function() {
+            template = "views/modals/schemaModal.tpl.html?bust=" + Math.random().toString(36).slice(2);
+
+            if (template != "") {
+                var modalInstance = $uibModal.open({
+                    templateUrl: template,
+                    controller: 'schemaCtrl',
+                    resolve: {
+                        schemas: function() {
+                            return $scope.schemas;
+                        }
+                    }
+                }).result.then(function(result) { //this happens when the modal is closed, not dismissed
+
+                    if (result.action == 'add') {
+                        var jsonData_addSchema = (JSON.stringify({
+                            schema: result.schema
+                        }));
+
+                        if (result.file != null) {
+                            var fd = new FormData();
+                            angular.forEach(result.file,function(file){
+                            fd.append('file',file);
+                            });
+                            fd.append("data", jsonData_addSchema);
+
+                            schemasFactory.addSchema(fd).success(function (data) {
+                                $scope.schemas = data;
+                                feedbackService.addMessage('A new schema was added', '200');
+                            })
+                            .error(function(result,status) {
+                                feedbackService.addMessage(result, status);
+                            });
+                        } else {//no file uploaded or other unforeseen error
+                                feedbackService.addMessage('Unable to add schema', '400');
+                        }
+                    } else if (result.action == 'delete') {
+                        var jsonData_deleteSchema = (JSON.stringify({
+                            delete: result.delete
+                        }));
+                        console.log(result.delete);
+
+                        schemasFactory.deleteSchema(jsonData_deleteSchema).success(function (data) {
+                            $scope.schemas = data;
+                            feedbackService.addMessage('Schema '+result.delete+" was successfully delete", '200');
+                        })
+                        .error(function(result,status) {
+                            feedbackService.addMessage(result, status);
+                        });
+                    }
+                });
+            }
+        }
 };

@@ -15,6 +15,7 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 #-------------------------------------------------------------------------------
 #This is for the use on a local machine
 UPLOAD_FOLDER = 'C:/Uploads'
+SCHEMA_FOLDER = 'C:/Schemas'
 if os.environ.get('DATABASE_URL') is None:
    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'app.db')
 else:

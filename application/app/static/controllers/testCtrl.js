@@ -21,6 +21,7 @@ angular.module("myApp").controller("testCtrl",  testCtrl);
         $scope.hideAddESP = true;
         $scope.hideRightSearch = true;
         $scope.hideCreate = true;
+        $scope.hideSchema = true;
         $scope.hideESPS = true;
         $scope.hideCheckBox = true;
 

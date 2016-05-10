@@ -1,13 +1,14 @@
 import os
 import time
 from flask import render_template, flash, redirect, url_for, request, make_response, Response, json
-from app import app, scenarioList, models, compare, output, parser
+from app import app, scenarioList, models, compare, output, parser, schemaValidation
 from werkzeug import secure_filename
 import re
 
 #This script is the interface between the user interface in the form of webpages, and the classes that perform
 #the manipulations of data
 ALLOWED_EXTENSIONS = set(['txt', 'xml'])
+SCHEMA_EXTENSIONS = set(['xsd'])
 
 
 #main page
@@ -371,3 +372,43 @@ def refresh_esp_list(name):
             scen = models.Scenario.get_scenario(name)
             scen_esps = scen.get_esps_as_list()
             return json.dumps(scen_esps)
+
+#--------------------SCHEMA VALIDATION------------------------------------------
+#function to check whether the uploaded schema has a valid '.xsd' file extension
+def schema_allowed(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1] in SCHEMA_EXTENSIONS
+
+@app.route('/get_schema_list', methods=['GET'])
+def get_schema_list():
+    return json.dumps(schemaValidation.validate.get_schema_list())
+
+@app.route('/add_schema', methods=['POST'])
+def add_schema():
+    if request.method == 'POST':
+        file = request.files['file']
+        data = json.loads(request.form['data'])
+        schema_name = data['schema']
+        error = ''
+        filename = ''
+        if file:
+            if schema_allowed(file.filename):
+                filename = secure_filename(file.filename)
+                if not os.path.isfile(app.config['SCHEMA_FOLDER'] + '/' + schema_name + '.xsd'):
+                    file.save(os.path.join(app.config['SCHEMA_FOLDER'], filename))
+                    os.rename(app.config['SCHEMA_FOLDER'] + '/' + filename,app.config['SCHEMA_FOLDER'] + '/' + schema_name + '.xsd')
+                else:
+                    error += "A schema with name '%s' already exists." % schema_name
+            else:
+                error += "File uploaded must be a valid schema with file extension of .xsd."
+        else:
+            error = "Please upload a file to create this scenario."
+    if len(error) > 0:
+        return make_response(error, 400);
+    return get_schema_list()
+
+@app.route('/delete_schema', methods=['POST'])
+def delete_schema():
+    filename = request.json['delete']
+    if os.path.isfile(app.config['SCHEMA_FOLDER'] + '/' + filename + '.xsd'):
+        os.remove(app.config['SCHEMA_FOLDER'] + '/' + filename + '.xsd')
+    return get_schema_list()

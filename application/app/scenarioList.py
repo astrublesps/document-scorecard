@@ -10,7 +10,7 @@ class ScenarioList:
         reformat_list = []
         scen_list = models.Scenario.get_list()
         for data in scen_list:
-           # reformat_list.append([ data.name,data.description]) 
+           # reformat_list.append([ data.name,data.description])
              reformat_list.append({ 'name' : data.name, 'description' : data.description, 'doctype' : data.doctype, 'date_created': data.date_created, 'date_updated' : data.date_updated})
         return reformat_list
 
@@ -28,7 +28,7 @@ class ScenarioList:
         else:
             if old_scen_exists:
                 #get together all the info on the scenario we're copying
-                old_scen = models.Scenario.get_scenario(name_of_old_scen) 
+                old_scen = models.Scenario.get_scenario(name_of_old_scen)
                 esps = old_scen.get_esps()
                 doctype = old_scen.doctype
                 copy_scen =  models.Scenario.create_scenario(name_of_new_scen, descr_of_new_scen, doctype)
@@ -38,7 +38,7 @@ class ScenarioList:
                         qual_esp = models.ESP(esp.xpath, esp.score, esp.data, True)
                         copy_scen.add_esp(qual_esp)
                         for child in esp.get_qual_children():
-                            qual_esp.add_child(child) 
+                            qual_esp.add_child(child)
                     elif esp.has_equals():
                         copy_scen.add_esp(esp)
                         for equal in esp.get_equals():
@@ -102,7 +102,7 @@ class ScenarioList:
                             else:
                                 e = models.ESP(xpath, parse_score, data['data'])
                     else:
-                        e = models.ESP(xpath, 5, data['data'])    
+                        e = models.ESP(xpath, 5, data['data'])
                     if scenario.get_single_esp_for_scen(e.xpath, e.score, e.data) is None:
                         scenario.add_esp(e)
 
