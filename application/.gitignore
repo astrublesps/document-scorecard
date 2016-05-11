@@ -3,6 +3,10 @@ __pycache__/
 .idea/
 *.iml
 ALL_UPLOADS/
+/app/SCHEMAS/*.xsd
+SCHEMAS/*.xsd
 dsc_log/
+/app/*.xml
 application/app/static/bower_components/
+/*.xml
 node_modules/

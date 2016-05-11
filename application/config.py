@@ -6,7 +6,11 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 
 #-------------------------------------------------------------------------------
 #This is for the use on the ubuntu server
-# UPLOAD_FOLDER = 'ALL_UPLOADS'
+
+APP_FOLDER = 'app'
+UPLOAD_FOLDER = APP_FOLDER + '/ALL_UPLOADS'
+SCHEMA_FOLDER = APP_FOLDER + '/SCHEMAS'
+GENERATEDS_FOLDER = 'generateDS'
 # SQLALCHEMY_DATABASE_URI = 'postgresql:///scorecard'
 # SQLALCHEMY_BINDS = {'usagedb': 'postgresql:///appusage',}
 # APP_NAME = 'DSC'
@@ -14,8 +18,8 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 
 #-------------------------------------------------------------------------------
 #This is for the use on a local machine
-UPLOAD_FOLDER = 'C:/Uploads'
-SCHEMA_FOLDER = 'C:/Schemas'
+# UPLOAD_FOLDER = 'C:/Uploads'
+# SCHEMA_FOLDER = 'C:/Schemas'
 if os.environ.get('DATABASE_URL') is None:
    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'app.db')
 else:

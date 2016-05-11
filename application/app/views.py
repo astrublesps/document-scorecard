@@ -1,57 +1,64 @@
 import os
 import time
 from flask import render_template, flash, redirect, url_for, request, make_response, Response, json
-from app import app, scenarioList, models, compare, output, parser, schemaValidation
+from app import app, scenarioList, models, compare, output, parser, schemaValidation, schemaOrder
 from werkzeug import secure_filename
 import re
 
-#This script is the interface between the user interface in the form of webpages, and the classes that perform
-#the manipulations of data
+# This script is the interface between the user interface in the form of webpages, and the classes that perform
+# the manipulations of data
 ALLOWED_EXTENSIONS = set(['txt', 'xml'])
-SCHEMA_EXTENSIONS = set(['xsd'])
 
 
-#main page
+# main page
 @app.route('/')
 @app.route('/index')
 def documentscorecard_index():
-    return render_template("index.html", scenarios = get_scenario_list())
+    return render_template("index.html", scenarios=get_scenario_list())
 
-@app.route('/test_error', defaults = {'error': 'There was an error.'})
+
+@app.route('/test_error', defaults={'error': 'There was an error.'})
 @app.route('/test_<error>')
 def index_error(error):
     log_error(error)
-    return render_template("index.html", scenarios = get_scenario_list(), error = error)
+    return render_template("index.html", scenarios = get_scenario_list(), error=error)
+
 
 def log_error(error):
     app.logger.info(error)
 
-#function to get the list of all scenarios
+
+# function to get the list of all scenarios
 @app.route('/get_scenario_list', methods=['GET'])
 def get_scenario_list():
     if request.method == 'GET':
         return Response(json.dumps(scenarioList.ScenarioList.get_list()), mimetype='application/json')
 
-#page for editing the scenarios
-@app.route('/scenarios', defaults = {'error':None})
-def scenarios(error):
-    return render_template("scenarios.html", scenarios = get_scenario_list(), error = error)
 
-@app.route('/scenario_error', defaults = {'error': 'There was an error.'})
+# page for editing the scenarios
+@app.route('/scenarios', defaults={'error': None})
+def scenarios(error):
+    return render_template("scenarios.html", scenarios=get_scenario_list(), error=error)
+
+
+@app.route('/scenario_error', defaults={'error': 'There was an error.'})
 @app.route('/scenario_<error>')
 def scenario_error(error):
     log_error(error)
-    return render_template("scenarios.html", scenarios = get_scenario_list(), error = error)
+    return render_template("scenarios.html", scenarios=get_scenario_list(), error=error)
 
-#function to check whether the uploaded file is a type of file that can be accepted by the application
+
+# function to check whether the uploaded file is a type of file that can be accepted by the application
 def file_allowed(filename):
     return '.' in filename and filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
 
-#function to clean input names
+
+# function to clean input names
 def is_allowed_string(string):
     return True
 
-#accepts an uploaded file and parses it into a new scenario with a name, description, and esps
+
+# accepts an uploaded file and parses it into a new scenario with a name, description, and esps
 @app.route('/upload_new_scenario', methods=['POST'])
 def upload_new_scenario():
     if request.method == 'POST':
@@ -71,7 +78,7 @@ def upload_new_scenario():
             if file_allowed(file.filename):
                 filename = secure_filename(file.filename)
                 file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-                input_data, equal_esps_list,qualified_rep_dict = parser.Parser.scenario_parse(app.config['UPLOAD_FOLDER'] + '/'+ filename)
+                input_data, equal_esps_list,qualified_rep_dict = parser.Parser.scenario_parse(app.config['UPLOAD_FOLDER']+'/'+filename)
                 if isinstance(input_data, list):
                     is_valid = True
                 else:
@@ -90,12 +97,13 @@ def upload_new_scenario():
             else:
                 error = "That name is in use. Please choose another."
         if len(error) < 1 :
-            return (json.dumps(scenarioList.ScenarioList.get_list()))
+            return json.dumps(scenarioList.ScenarioList.get_list())
         else:
             response = make_response(error, 400)
             return response
 
-#accepts just a name and description for a new blank scenario
+
+# accepts just a name and description for a new blank scenario
 @app.route('/create_scenario', methods=['POST'])
 def create_scenario():
     if request.method == 'POST':
@@ -108,13 +116,13 @@ def create_scenario():
             error += "The name %s is taken. Please choose another name." % name
         if len(error) < 1:
             flash("Scenario %s was created successfully." % name)
-            return (json.dumps(scenarioList.ScenarioList.get_list()))
+            return json.dumps(scenarioList.ScenarioList.get_list())
         else:
             response = make_response(error, 400)
             return response
 
 
-#deletes a scenario if it exists
+# deletes a scenario if it exists
 @app.route('/delete_scenario', methods=['POST'])
 def delete_scenario():
     error = ''
@@ -125,12 +133,13 @@ def delete_scenario():
             error = "Scenario %s does not exist" % name
         if len(error) < 1:
             flash("Scenario %s was successfully deleted." % name)
-            return (json.dumps(scenarioList.ScenarioList.get_list()))
+            return json.dumps(scenarioList.ScenarioList.get_list())
         else:
             response = make_response(error, 400)
             return response
 
-#makes a copy of a scenario that already exists
+
+# makes a copy of a scenario that already exists
 @app.route('/copy_scenario', methods=['POST'])
 def copy_scenario():
     if request.method == 'POST':
@@ -139,19 +148,20 @@ def copy_scenario():
         name_of_new_scen = request.json['newName']
         descr_of_new_scen = request.json['newDescription']
         if len(name_of_old_scen) > 0 and len(name_of_new_scen) > 0:
-            result  = scenarioList.ScenarioList.copy_scenario(name_of_old_scen, name_of_new_scen, descr_of_new_scen)
+            result = scenarioList.ScenarioList.copy_scenario(name_of_old_scen, name_of_new_scen, descr_of_new_scen)
             if not isinstance(result, bool):
                 error = result
         else:
             error = "The name of the scenario to copy and the name of the new scenario must be specified."
         if len(error) < 1:
             flash("Scenario %s was successfully copied as %s." %(name_of_old_scen, name_of_new_scen))
-            return (json.dumps(scenarioList.ScenarioList.get_list()))
+            return json.dumps(scenarioList.ScenarioList.get_list())
         else:
             response = make_response(error, 400)
             return response
 
-#renames a scenario that already exists
+
+# renames a scenario that already exists
 @app.route('/edit_scenario', methods=['POST'])
 def edit_scenario():
     if request.method == 'POST':
@@ -163,12 +173,13 @@ def edit_scenario():
             error = result
         if len(error) < 1:
             flash("Scenario %s was successfully renamed to %s." % (old_name, new_name))
-            return (json.dumps(scenarioList.ScenarioList.get_list()))
+            return json.dumps(scenarioList.ScenarioList.get_list())
         else:
             response = make_response(error, 400)
             return response
 
-#adds a single given esp to a specified scenario
+
+# adds a single given esp to a specified scenario
 @app.route('/add_esp', methods=['POST'])
 def add_esp():
     if request.method == 'POST':
@@ -199,7 +210,8 @@ def add_esp():
             response = make_response(error, 400)
             return response
 
-#removes one esp from a particular scenario
+
+# removes one esp from a particular scenario
 @app.route('/remove_esp', methods=['POST'])
 def remove_esp():
     if request.method == 'POST':
@@ -223,11 +235,12 @@ def remove_esp():
             response = make_response(error, 400)
             return response
 
-#removes one esp from a particular scenario
+
+# removes one esp from a particular scenario
 @app.route('/edit_esp', methods=['POST'])
 def edit_esp():
     if request.method == 'POST':
-        #print(request.json)
+        # print(request.json)
         error = ""
         name = request.json['scenName']
         old_xpath = request.json['oldXpath']
@@ -256,7 +269,7 @@ def edit_esp():
             quals = re.sub("is", "", old_xpath.split(" where ")[-1])
             old_xpath = re.sub(" where (.*)","",xpath)
             quals = quals.split()
-        #print("%s:%s:%s:%s:%s:%s:%s" % (name, old_xpath, old_data, str(old_score), xpath, data, str(score)))
+        # print("%s:%s:%s:%s:%s:%s:%s" % (name, old_xpath, old_data, str(old_score), xpath, data, str(score)))
         success = models.Scenario.edit_esp(name, old_xpath, old_data, old_score, xpath, data, score, quals)
         if not success:
             error = "Unable to edit esp."
@@ -288,8 +301,9 @@ def get_esps():
             response = make_response(error, 400)
             return response
 
+
 # The most important function of the application. Uploads an input file, checks to see if it's the right kind of file,
-# then sends it to the output class, which parses it and compares it one or more given scenarios and sends back a string,
+# then sends it to the output class, which parses it and compares it one or more given scenarios and sends back a string
 # from which this function creates a downloadable txt file with the results of the comparison
 @app.route('/compare_download', methods=['POST'])
 def compare_download():
@@ -306,11 +320,11 @@ def compare_download():
         valid_input = False
         input_data = []
         if len(selected_list) > 0:
-            if file and file_allowed(file.filename): #check whether this is an ok file type
+            if file and file_allowed(file.filename): # check whether this is an ok file type
                 filename = secure_filename(file.filename)
                 file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
                 input_data, empty_nodes, tree = parser.Parser.input_parse(app.config['UPLOAD_FOLDER'] + '/' + filename)
-                if isinstance(input_data, dict) and not input_data == "Error":#check to see that parsing the file was successful
+                if isinstance(input_data, dict) and not input_data == "Error":  # check to see that parsing the file was successful
                     valid_input = True
                 else:
                     error += "Error parsing %s. Please check that file is valid XML." % file.filename
@@ -321,12 +335,12 @@ def compare_download():
             if valid_input:
                 down_file = output.Output.create_file(input_data, empty_nodes, tree, selected_list, also_check_content)
 
-                if down_file.startswith("Error"): #there was an error in file creation; type of error specified in the error string
+                if down_file.startswith("Error"):  # there was an error in file creation; type of error specified in the error string
                     error += down_file
                 else:
-                    #make a downloadable file
+                    # make a downloadable file
                     scens = selected_list.split(",")
-                    record_usage(float("{0:.3f}".format(time.time() - start_time)), False, (str(len(scens)) + " scenarios" + "- " + selected_list))
+                    record_usage(float("{0:.3f}".format(time.time() - start_time)), False, (str(len(scens))+" scenarios"+"- "+selected_list))
                     response = make_response(down_file)
                     response.headers["Content-Disposition"] = "attachment; filename=%s-DSC.txt" % filename.rsplit('.')[0]
                     return response
@@ -340,6 +354,7 @@ def compare_download():
             response = make_response(error, 400)
             return response
 
+
 @app.route('/download_esp_list', methods=['POST'])
 def download_esp_list():
     if request.method == 'POST':
@@ -351,19 +366,29 @@ def download_esp_list():
         except KeyError:
             list_has_things = False
         if list_has_things:
-           # parser.Parser.create_file(selected_list)
             down_file = output.Output.get_scenario_as_xml_tree(selected_list)
-            response = make_response(down_file)
-            response.headers["Content-Disposition"]="attachment;filename=%s-requirements.txt" % selected_list.replace(",","-")
+            schema_name = 'OrderAcks'
+            with open('dsc.xml', 'wb') as w:
+                w.write(down_file)
+            print('dsc.xml')
+            down_file = schemaOrder.order.order_xml('dsc.xml', schema_name)
+            print(down_file)
+
+            with open(app.config['APP_FOLDER']+'/output.xml', 'r') as r:
+                strr = r.read()
+            response = make_response(strr)
+            response.headers["Content-Disposition"] = "attachment;filename=%s-requirements.txt" % selected_list.replace(",","-")
             return response
         else:
-           error = "Please select a Scenario for which you would a list of xpaths."
-           response = make_response(error, 400)
-           return response
+            error = "Please select a Scenario for which you would a list of xpaths."
+            response = make_response(error, 400)
+            return response
+
 
 def record_usage(processing_time, err, misc):
     app_id = int(models.get_app(app.config['APP_NAME']).id)
     models.add_info(app_id, request.environ.get('HTTP_X_REAL_IP', request.remote_addr), processing_time, err, misc)
+
 
 # returns a list of esps if successful, else returns the webpage with a message.
 def refresh_esp_list(name):
@@ -373,14 +398,13 @@ def refresh_esp_list(name):
             scen_esps = scen.get_esps_as_list()
             return json.dumps(scen_esps)
 
-#--------------------SCHEMA VALIDATION------------------------------------------
-#function to check whether the uploaded schema has a valid '.xsd' file extension
-def schema_allowed(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1] in SCHEMA_EXTENSIONS
 
+# --------------------SCHEMA VALIDATION------------------------------------------
+# function to check whether the uploaded schema has a valid '.xsd' file extension
 @app.route('/get_schema_list', methods=['GET'])
 def get_schema_list():
     return json.dumps(schemaValidation.validate.get_schema_list())
+
 
 @app.route('/add_schema', methods=['POST'])
 def add_schema():
@@ -389,26 +413,21 @@ def add_schema():
         data = json.loads(request.form['data'])
         schema_name = data['schema']
         error = ''
-        filename = ''
         if file:
-            if schema_allowed(file.filename):
-                filename = secure_filename(file.filename)
-                if not os.path.isfile(app.config['SCHEMA_FOLDER'] + '/' + schema_name + '.xsd'):
-                    file.save(os.path.join(app.config['SCHEMA_FOLDER'], filename))
-                    os.rename(app.config['SCHEMA_FOLDER'] + '/' + filename,app.config['SCHEMA_FOLDER'] + '/' + schema_name + '.xsd')
-                else:
-                    error += "A schema with name '%s' already exists." % schema_name
-            else:
-                error += "File uploaded must be a valid schema with file extension of .xsd."
+            # if this is empty, schema was successfully added
+            error = schemaValidation.validate.add_schema(file, schema_name)
         else:
-            error = "Please upload a file to create this scenario."
+            error = "A schema must be upload."
     if len(error) > 0:
-        return make_response(error, 400);
+        return make_response(error, 400)
     return get_schema_list()
+
 
 @app.route('/delete_schema', methods=['POST'])
 def delete_schema():
     filename = request.json['delete']
-    if os.path.isfile(app.config['SCHEMA_FOLDER'] + '/' + filename + '.xsd'):
-        os.remove(app.config['SCHEMA_FOLDER'] + '/' + filename + '.xsd')
+    # if this is empty, schema was successfully deleted
+    error = schemaValidation.validate.delete_schema(filename)
+    if len(error) > 0:
+        return make_response(error, 400)
     return get_schema_list()

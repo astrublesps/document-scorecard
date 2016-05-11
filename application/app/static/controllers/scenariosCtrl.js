@@ -246,7 +246,7 @@ angular.module("myApp").controller("scenariosCtrl",  scenariosCtrl);
 
                             schemasFactory.addSchema(fd).success(function (data) {
                                 $scope.schemas = data;
-                                feedbackService.addMessage('A new schema was added', '200');
+                                feedbackService.addMessage('Schema '+result.schema+' was added', '200');
                             })
                             .error(function(result,status) {
                                 feedbackService.addMessage(result, status);
