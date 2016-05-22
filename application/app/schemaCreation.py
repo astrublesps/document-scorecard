@@ -4,20 +4,16 @@ import re
 import time
 from app import app
 
+
 class create:
-
-    # start_time = time.time()
-
     @staticmethod
     def remove_empty_lines(txt):
-        # print("remove_empty_lines--- %s seconds ---" % (time.time() - start_time))
         return '\n'.join([x for x in txt.split("\n") if x.strip() != ''])
-
 
     @staticmethod
     def configure_xsd(xsd):
         REGEX = {'<xs:enumeration>.+?</xs:enumeration>': '', '<xs:annotation>.+?</xs:annotation>': '',
-                 '<xs:simpleType>.+?</xs:simpleType>': ''}  # , 'type="(.+?)"': 'type="attributes-%1"'
+                 '<xs:simpleType>.+?</xs:simpleType>': '', 'type="xs:.+?"': 'type="attributes-string"'}
         f = open(xsd, 'r+')
         file_string = f.read()
         f.close()
@@ -26,18 +22,18 @@ class create:
             file_string = re.sub(regex, replacement, file_string)
         file_string = create.remove_empty_lines(file_string)
         # add_attributes()
-        file_string = re.sub('</xs:schema>', create.add_attributes()+'\n</xs:schema>', file_string)
+        file_string = re.sub('</xs:schema>', create.add_attributes() + '\n</xs:schema>', file_string)
         w = open(xsd, 'w')
         w.write(file_string)
         w.close()
-        # print("configure_xsd--- %s seconds ---" % (time.time() - start_time))
         return True
-
 
     @staticmethod
     def add_attributes():
+        attribs = ''
         ATTRIBUTE_TYPES = {'integer', 'string', 'date', 'decimal', 'boolean', 'date', 'time'}
-        ATTRIBUTES = {'score': 'int', 'qualified-rep': 'string', 'requires-one': 'string', 'not-equal': 'string', 'requires-others': 'string'}
+        ATTRIBUTES = {'score': 'int', 'qualified-rep': 'string', 'requires-one': 'string', 'not-equal': 'string',
+                      'requires-others': 'string'}
         for attribtypes in ATTRIBUTE_TYPES:
             attribs = '<xs:complexType name = "attributes-%s">\n<xs:simpleContent>\n<xs:extension base = "xs:%s">\n' \
                       % (attribtypes, attribtypes)
@@ -50,7 +46,6 @@ class create:
         # print(attribs)
         # print("add_attributes--- %s seconds ---" % (time.time() - start_time))
         return attribs
-
 
     @staticmethod
     def create_schema(xsd):
@@ -67,18 +62,8 @@ class create:
         xsd_name = xsd
         generateDS_path = app.config['GENERATEDS_FOLDER']
         os.system('python %s/generateDS.py -f -o %s %s'
-              % (generateDS_path, _object, xsd_name))
+                  % (generateDS_path, _object, xsd_name))
         print('creating schema')
         # os.system('python ..\generateDS-2.22a0\generateDS.py -f -o %s -s %s --super="%s" %s'
         #           % (_object, sub_object, _super, xsd_name))
-
-        # print("create_schema--- %s seconds ---" % (time.time() - start_time))
         return True
-
-
-
-
-    # try:
-    #     import Schema
-    # except ImportError:
-    #     print("Unable to import 'Schema' - import-schema.py")

@@ -7,7 +7,7 @@ import re
 
 # This script is the interface between the user interface in the form of webpages, and the classes that perform
 # the manipulations of data
-ALLOWED_EXTENSIONS = set(['txt', 'xml'])
+ALLOWED_EXTENSIONS = ['txt', 'xml']
 
 
 # main page
@@ -21,7 +21,7 @@ def documentscorecard_index():
 @app.route('/test_<error>')
 def index_error(error):
     log_error(error)
-    return render_template("index.html", scenarios = get_scenario_list(), error=error)
+    return render_template("index.html", scenarios=get_scenario_list(), error=error)
 
 
 def log_error(error):
@@ -65,10 +65,14 @@ def upload_new_scenario():
         file = request.files['file']
         data = json.loads(request.form['data'])
         name = data['name']
+        schema = data['schema']
         description = data['description']
         doctype = data['docType']
         if len(doctype) < 3:
-           doctype = '000'
+            doctype = '000'
+        fulfillmenttype = data['fulfillmentType']
+        print(schema)
+        print(fulfillmenttype)
         error = ''
         input_data = []
         equal_esps_list = []
@@ -78,25 +82,27 @@ def upload_new_scenario():
             if file_allowed(file.filename):
                 filename = secure_filename(file.filename)
                 file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-                input_data, equal_esps_list,qualified_rep_dict = parser.Parser.scenario_parse(app.config['UPLOAD_FOLDER']+'/'+filename)
+                input_data, equal_esps_list, qualified_rep_dict = parser.Parser.scenario_parse(
+                    app.config['UPLOAD_FOLDER'] + '/' + filename)
                 if isinstance(input_data, list):
                     is_valid = True
                 else:
-                        error = "The file %s could not be parsed." % file.filename
+                    error = "The file %s could not be parsed." % file.filename
             else:
                 error += "File type must be .xml or .txt."
         else:
             error = "Please upload a file to create this scenario."
         if is_valid:
             esps = input_data
-            result = scenarioList.ScenarioList.build_scenario(name, description, doctype, esps, equal_esps_list, qualified_rep_dict)
+            result = scenarioList.ScenarioList.build_scenario(name, description, doctype, esps,
+                                                              equal_esps_list, qualified_rep_dict)
             if isinstance(result, list):
                 error = "The scores for some ESPs were automatically adjusted to be within the range 1 through 5."
             elif isinstance(result, bool) and result:
                 flash("Scenario: %s successfully created." % name)
             else:
                 error = "That name is in use. Please choose another."
-        if len(error) < 1 :
+        if len(error) < 1:
             return json.dumps(scenarioList.ScenarioList.get_list())
         else:
             response = make_response(error, 400)
@@ -154,7 +160,7 @@ def copy_scenario():
         else:
             error = "The name of the scenario to copy and the name of the new scenario must be specified."
         if len(error) < 1:
-            flash("Scenario %s was successfully copied as %s." %(name_of_old_scen, name_of_new_scen))
+            flash("Scenario %s was successfully copied as %s." % (name_of_old_scen, name_of_new_scen))
             return json.dumps(scenarioList.ScenarioList.get_list())
         else:
             response = make_response(error, 400)
@@ -223,12 +229,12 @@ def remove_esp():
         quals = []
         if 'where' in xpath:
             quals = re.sub("is", "", xpath.split(" where ")[-1])
-            xpath = re.sub(" where (.*)","",xpath)
+            xpath = re.sub(" where (.*)", "", xpath)
             quals = quals.split()
         success = models.Scenario.public_remove_esp(name, xpath, data, score, quals)
         if not success:
             error = "Unable to remove esp."
-        if len(error) < 1 :
+        if len(error) < 1:
             flash("%s was successfully removed from %s." % (xpath, name))
             return Response(refresh_esp_list(name), mimetype='application/json')
         else:
@@ -267,13 +273,13 @@ def edit_esp():
             score = old_score
         if 'where' in old_xpath:
             quals = re.sub("is", "", old_xpath.split(" where ")[-1])
-            old_xpath = re.sub(" where (.*)","",xpath)
+            old_xpath = re.sub(" where (.*)", "", xpath)
             quals = quals.split()
         # print("%s:%s:%s:%s:%s:%s:%s" % (name, old_xpath, old_data, str(old_score), xpath, data, str(score)))
         success = models.Scenario.edit_esp(name, old_xpath, old_data, old_score, xpath, data, score, quals)
         if not success:
             error = "Unable to edit esp."
-        if len(error) < 1 :
+        if len(error) < 1:
             flash("%s was successfully edited." % (xpath))
             return Response(refresh_esp_list(name), mimetype='application/json')
         else:
@@ -320,11 +326,12 @@ def compare_download():
         valid_input = False
         input_data = []
         if len(selected_list) > 0:
-            if file and file_allowed(file.filename): # check whether this is an ok file type
+            if file and file_allowed(file.filename):  # check whether this is an ok file type
                 filename = secure_filename(file.filename)
                 file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
                 input_data, empty_nodes, tree = parser.Parser.input_parse(app.config['UPLOAD_FOLDER'] + '/' + filename)
-                if isinstance(input_data, dict) and not input_data == "Error":  # check to see that parsing the file was successful
+                if isinstance(input_data,
+                              dict) and not input_data == "Error":  # check to see that parsing the file was successful
                     valid_input = True
                 else:
                     error += "Error parsing %s. Please check that file is valid XML." % file.filename
@@ -335,14 +342,17 @@ def compare_download():
             if valid_input:
                 down_file = output.Output.create_file(input_data, empty_nodes, tree, selected_list, also_check_content)
 
-                if down_file.startswith("Error"):  # there was an error in file creation; type of error specified in the error string
+                if down_file.startswith(
+                        "Error"):  # there was an error in file creation; type of error specified in the error string
                     error += down_file
                 else:
                     # make a downloadable file
                     scens = selected_list.split(",")
-                    record_usage(float("{0:.3f}".format(time.time() - start_time)), False, (str(len(scens))+" scenarios"+"- "+selected_list))
+                    record_usage(float("{0:.3f}".format(time.time() - start_time)), False,
+                                 (str(len(scens)) + " scenarios" + "- " + selected_list))
                     response = make_response(down_file)
-                    response.headers["Content-Disposition"] = "attachment; filename=%s-DSC.txt" % filename.rsplit('.')[0]
+                    response.headers["Content-Disposition"] = "attachment; filename=%s-DSC.txt" % filename.rsplit('.')[
+                        0]
                     return response
         else:
             error = "Please select a Scenario to compare your input against."
@@ -359,6 +369,7 @@ def compare_download():
 def download_esp_list():
     if request.method == 'POST':
         list_has_things = False
+        selected_list = ''
         try:
             selected_list = request.json['name']
             if len(selected_list) > 0:
@@ -374,10 +385,11 @@ def download_esp_list():
             down_file = schemaOrder.order.order_xml('dsc.xml', schema_name)
             print(down_file)
 
-            with open(app.config['APP_FOLDER']+'/output.xml', 'r') as r:
+            with open(app.config['APP_FOLDER'] + '/output.xml', 'r') as r:
                 strr = r.read()
             response = make_response(strr)
-            response.headers["Content-Disposition"] = "attachment;filename=%s-requirements.txt" % selected_list.replace(",","-")
+            response.headers["Content-Disposition"] = "attachment;filename=%s-requirements.txt" % selected_list.replace(
+                ",", "-")
             return response
         else:
             error = "Please select a Scenario for which you would a list of xpaths."
@@ -392,11 +404,11 @@ def record_usage(processing_time, err, misc):
 
 # returns a list of esps if successful, else returns the webpage with a message.
 def refresh_esp_list(name):
-        exists = models.Scenario.check_exists(name)
-        if exists:
-            scen = models.Scenario.get_scenario(name)
-            scen_esps = scen.get_esps_as_list()
-            return json.dumps(scen_esps)
+    exists = models.Scenario.check_exists(name)
+    if exists:
+        scen = models.Scenario.get_scenario(name)
+        scen_esps = scen.get_esps_as_list()
+        return json.dumps(scen_esps)
 
 
 # --------------------SCHEMA VALIDATION------------------------------------------

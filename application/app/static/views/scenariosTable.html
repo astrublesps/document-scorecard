@@ -1,56 +1,60 @@
 <table class="table">
- <thead>
-   <tr>
-     <th width="5%" class="txt-center" ng-hide="hideCheckBox">
-     </th>
-     <th width="30%" class="sortable" ng-click="checkSort('Name')" ng-class="{active: sortColumn == 'Name'}">
-       Name
-     </th>
-     <th width="12%" class="sortable" ng-hide="hideDocType" ng-click="checkSort('DocumentType')" ng-class="{active: sortColumn == 'DocumentType'}">
-       Doc Type
-     </th>
-     <th width="14%" class="sortable hide-for-small" title="created date" ng-hide="hideDateCreated" ng-click="checkSort('DateCreated')" ng-class="{active: sortColumn == 'DateCreated'}">
-       Created
-     </th>
-     <th width="14%" class="sortable" title="last modified date" ng-hide="hideDateModified" ng-click="checkSort('LastModified')" ng-class="{active: sortColumn == 'LastModified'}">
-       Modified
-     </th>
-     <th width="25%" class="txt-right">
-       Actions
-     </th>
-   </tr>
- </thead>
- <tbody>
+    <thead>
+    <tr>
+        <th width="5%" class="txt-center" ng-hide="hideCheckBox">
+        </th>
+        <th width="30%" class="sortable" ng-click="checkSort('Name')" ng-class="{active: sortColumn == 'Name'}">
+            Name
+        </th>
+        <th width="12%" class="sortable" ng-hide="hideDocType" ng-click="checkSort('DocumentType')"
+            ng-class="{active: sortColumn == 'DocumentType'}">
+            Doc Type
+        </th>
+        <th width="14%" class="sortable hide-for-small" title="created date" ng-hide="hideDateCreated"
+            ng-click="checkSort('DateCreated')" ng-class="{active: sortColumn == 'DateCreated'}">
+            Created
+        </th>
+        <th width="14%" class="sortable" title="last modified date" ng-hide="hideDateModified"
+            ng-click="checkSort('LastModified')" ng-class="{active: sortColumn == 'LastModified'}">
+            Modified
+        </th>
+        <th width="25%" class="txt-right">
+            Actions
+        </th>
+    </tr>
+    </thead>
+    <tbody>
     <tr ng-repeat="scenario in scenarios | filter: scenarioFilter.filter | orderBy: sortColumn : reverse"
         id="{[ scenario.name ]}" title="{[ scenario.description ]}"
-             ng-class="{selected : scenario.isChecked}">
+        ng-class="{selected : scenario.isChecked}">
         <td ng-hide="hideCheckBox">
-          <input id="checkbox-{[scenario.name]}" stop-event type="checkbox"
-          ng-model="scenario.isChecked" ng-click="setSelectedScenario(scenario); scenarioFilter = scenario.name"
-          ng-true-value="true" ng-false-value="false">
-          <label for="checkbox-{[scenario.name]}">&nbsp;</label>
+            <input id="checkbox-{[scenario.name]}" stop-event type="checkbox"
+                   ng-model="scenario.isChecked"
+                   ng-click="setSelectedScenario(scenario); scenarioFilter = scenario.name"
+                   ng-true-value="true" ng-false-value="false">
+            <label for="checkbox-{[scenario.name]}">&nbsp;</label>
         </td>
         <td>{[ scenario.name ]}</td>
         <td class="txt-center" ng-hide="hideDocType">{[ scenario.doctype ]}</td>
-        <td class="hide-for-small" ng-hide="hideDateCreated">{[ scenario.date_created ]}</td>
-        <td ng-hide="hideDateModified">{[ scenario.date_updated ]}</td>
+        <td class="hide-for-small" ng-hide="hideDateCreated">{[ scenario.schema ]}</td>
+        <td ng-hide="hideDateModified">{[ scenario.fulfillmenttype ]}</td>
         <td class="actions txt-right">
-          <a class="no-border" title="download scenario" ng-hide="hideDownLoad" ng-click="downloadScenario(scenario)">
-            <i class="fa fa-cloud-download fa-lg"></i>
-          </a>
-          <a class="no-border" title="edit scenario info" ng-hide="hideEdit" ng-click="openModal('edit', scenario)">
-            <i class="fa fa-edit fa-lg"></i>
-          </a>
-          <a class="no-border" title="copy scenario" ng-hide="hideCopy" ng-click="openModal('copy', scenario)">
-            <i class="fa fa-copy fa-lg"></i>
-          </a>
-          <a class="no-border" title="delete scenario" ng-hide="hideRemove" ng-click="openModal('delete', scenario)">
-            <i class="fa fa-trash-o fa-lg"></i>
-          </a>
-           <a class="no-border" title="add scenario to test" ng-hide="hideAddTest" ng-click="addToList(scenario)">
-             <i class="fa fa-level-up fa-lg fa-rotate-90"></i>
-           </a>
+            <a class="no-border" title="download scenario" ng-hide="hideDownLoad" ng-click="downloadScenario(scenario)">
+                <i class="fa fa-cloud-download fa-lg"></i>
+            </a>
+            <a class="no-border" title="edit scenario info" ng-hide="hideEdit" ng-click="openModal('edit', scenario)">
+                <i class="fa fa-edit fa-lg"></i>
+            </a>
+            <a class="no-border" title="copy scenario" ng-hide="hideCopy" ng-click="openModal('copy', scenario)">
+                <i class="fa fa-copy fa-lg"></i>
+            </a>
+            <a class="no-border" title="delete scenario" ng-hide="hideRemove" ng-click="openModal('delete', scenario)">
+                <i class="fa fa-trash-o fa-lg"></i>
+            </a>
+            <a class="no-border" title="add scenario to test" ng-hide="hideAddTest" ng-click="addToList(scenario)">
+                <i class="fa fa-level-up fa-lg fa-rotate-90"></i>
+            </a>
         </td>
     </tr>
- </tbody>
+    </tbody>
 </table>

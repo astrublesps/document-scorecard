@@ -7,13 +7,11 @@ from werkzeug import secure_filename
 
 class validate:
 
-    SCHEMA_EXTENSIONS = set(['xsd'])
-
+    SCHEMA_EXTENSIONS = ['xsd']
 
     @staticmethod
     def schema_allowed(filename):
         return '.' in filename and filename.rsplit('.', 1)[1] in validate.SCHEMA_EXTENSIONS
-
 
     @staticmethod
     def get_schema_list():

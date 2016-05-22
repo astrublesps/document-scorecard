@@ -30,5 +30,4 @@ class order:
         w = open(app.config['APP_FOLDER']+'/output.xml', 'w')
         rootObj.export(w, 0, name_=rootTag, namespacedef_='', pretty_print=True)
         w.close()
-        # print("print_xml--- %s seconds ---" % (time.time() - start_time))
         return True

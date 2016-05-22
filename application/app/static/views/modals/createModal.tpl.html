@@ -1,76 +1,95 @@
-<div id="create-modal" class="reveal-modal open" data-reveal tabindex="0" aria-hidden="false" style="display: block; opacity: 1; visibility: visible; top: 100px; max-height: 500px; width: auto">
-  <header class="modal-title">
-    Create a new scenario
-  </header>
-  <ul class="fa-ul">
-      <li>
-        <div class="droparea" drag-drop>
-          <div class="row">
-            <input type="file" ng-model-instant id="fileToUpload" onchange="angular.element(this).scope().setFiles(this)" />
-          </div>
-          <div id="dropbox" ng-hide="files.length" class="dropbox" ><span>{[dropText]}</span></div>
-          <div ng-show="files.length">
-              <div ng-repeat="file in files.slice(0)">
-                  <span>{[file.webkitRelativePath || file.name]}</span>
-                  (<span ng-switch="file.size > 1024*1024">
+<div id="create-modal" class="reveal-modal open" data-reveal tabindex="0" aria-hidden="false"
+     style="display: block; opacity: 1; visibility: visible; top: 100px; max-height: 500px; width: auto">
+    <header class="modal-title">
+        Create a new scenario
+    </header>
+    <ul class="fa-ul">
+        <li>
+            <div class="droparea" drag-drop>
+                <div class="row">
+                    <input type="file" ng-model-instant id="fileToUpload"
+                           onchange="angular.element(this).scope().setFiles(this)"/>
+                </div>
+                <div id="dropbox" ng-hide="files.length" class="dropbox"><span>{[dropText]}</span></div>
+                <div ng-show="files.length">
+                    <div ng-repeat="file in files.slice(0)">
+                        <span>{[file.webkitRelativePath || file.name]}</span>
+                        (<span ng-switch="file.size > 1024*1024">
                       <span ng-switch-when="true">{[file.size / 1024 / 1024 | number:2]} MB</span>
                       <span ng-switch-default>{[file.size / 1024 | number:2]} kB</span>
                   </span>)
-              </div>
-          </div>
-        </div>
-        <span style="font-size: .8em"><strong>Note</strong>: Files must be .xml. Do not upload a file if you wish to create a blank scenario.</span>
-      </li>
-      <li>
-        <div>
-          <label class="required">
-            Scenario
-            <input type="text" autofocus placeHolder="enter a new scenario name..." ng-model="newScenario.name">
-          </label>
-        </div>
-        <div>
-          <label class="required">
-            description
-            <input type="text" placeHolder="enter a new description name..." ng-model="newScenario.description">
-          </label>
-        </div>
-        <div class="row">
-          <div class="large-4 small-4 columns">
-            <label class="required">
-              Doc Type
-              <select name="singleSelect" ng-model="newScenario.docType">
-                <option value="810">810</option>
-                <option value="846">846</option>
-                <option value="850">850</option>
-                <option value="855">855</option>
-                <option value="856">856</option>
-              </select>
-            </label>
-          </div>
-          <div class="large-10 small-10 columns">
-             <label title="Required to download a scenario">
-               Schema association
-               <select name="singleSelect" ng-model="newScenario.schema">
-                 <option value="">None</option>
-                 <option ng-repeat="schema in schemas" value="{[ schema.name ]}">{[ schema.name ]}</option>
-               </select>
-             </label>
-          </div>
-        </div>
-      </li>
-  </ul>
-  <ul class="form-actions">
-    <li class="msg">
-      <strong>Note:</strong> These fields can be edited after creation.
-    </li>
-    <li>
-      <button class="button" ng-click="cancelModal()">Cancel</button>
-    </li>
-    <li>
-      <button ng-click="closeModal()" class="confirm" ng-disabled="!newScenario.name || !newScenario.description || !newScenario.docType">
-      Create scenario
-    </button>
-    </li>
-  </ul>
-  <a class="close-reveal-modal" ng-click="cancelModal()">x</a>
+                    </div>
+                </div>
+            </div>
+            <span style="font-size: .8em"><strong>Note</strong>: Files must be .xml. Do not upload a file if you wish to create a blank scenario.</span>
+        </li>
+        <li>
+            <div>
+                <label class="required">
+                    Scenario
+                    <input type="text" autofocus placeHolder="enter a new scenario name..." ng-model="newScenario.name">
+                </label>
+            </div>
+            <div>
+                <label class="required">
+                    description
+                    <input type="text" placeHolder="enter a new description name..." ng-model="newScenario.description">
+                </label>
+            </div>
+            <div class="row">
+                <div class="large-4 small-4 columns">
+                    <label class="required">
+                        Doc Type
+                        <select name="singleSelect" ng-model="newScenario.docType">
+                            <option value="810">810</option>
+                            <option value="846">846</option>
+                            <option value="850">850</option>
+                            <option value="855">855</option>
+                            <option value="856">856</option>
+                        </select>
+                    </label>
+                </div>
+                <div class="large-10 small-10 columns">
+                    <label title="Required to download a scenario">
+                        Schema association
+                        <select name="singleSelect" ng-model="newScenario.schema">
+                            <option value="">None</option>
+                            <option ng-repeat="schema in schemas" value="{[ schema.name ]}">{[ schema.name ]}</option>
+                        </select>
+                    </label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="large-4 small-4 columns">
+                    <label title="Fulfillment Type">
+                        Fulfillment Type
+                        <select name="singleSelect" ng-model="newScenario.fulfillmentType">
+                            <option value="Bulk Import">Bulk Import</option>
+                            <option value="Drop Ship">Drop Ship</option>
+                            <option value="Multi Store">Multi Store</option>
+                            <option value="Cross Dock">Cross Dock</option>
+                            <option value="Multiple">Multiple</option>
+                        </select>
+                    </label>
+                </div>
+                <div class="large-10 small-10 columns">
+                </div>
+            </div>
+        </li>
+    </ul>
+    <ul class="form-actions">
+        <li class="msg">
+            <strong>Note:</strong> These fields can be edited after creation.
+        </li>
+        <li>
+            <button class="button" ng-click="cancelModal()">Cancel</button>
+        </li>
+        <li>
+            <button ng-click="closeModal()" class="confirm"
+                    ng-disabled="!newScenario.name || !newScenario.description || !newScenario.docType">
+                Create scenario
+            </button>
+        </li>
+    </ul>
+    <a class="close-reveal-modal" ng-click="cancelModal()">x</a>
 </div>

@@ -11,6 +11,7 @@ APP_FOLDER = 'app'
 UPLOAD_FOLDER = APP_FOLDER + '/ALL_UPLOADS'
 SCHEMA_FOLDER = APP_FOLDER + '/SCHEMAS'
 GENERATEDS_FOLDER = 'generateDS'
+BASE_FOLDER = basedir
 # SQLALCHEMY_DATABASE_URI = 'postgresql:///scorecard'
 # SQLALCHEMY_BINDS = {'usagedb': 'postgresql:///appusage',}
 # APP_NAME = 'DSC'
