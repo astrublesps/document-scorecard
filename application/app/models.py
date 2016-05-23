@@ -1,8 +1,20 @@
+from flask import Flask
 import datetime
-from app import db
 from sqlalchemy import asc,func
 from sqlalchemy.sql import exists
 from sqlalchemy.ext.associationproxy import association_proxy
+from flask.ext.sqlalchemy import SQLAlchemy
+from flask.ext.script import Manager
+from flask.ext.migrate import Migrate, MigrateCommand
+
+app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
+
+db = SQLAlchemy(app)
+migrate = Migrate(app, db)
+
+manager = Manager(app)
+manager.add_command('db', MigrateCommand)
 
 #This code is the interface between python and the actual database. The methods are queries created in python that are
 #translated into SQL using sqlalchemy
@@ -42,6 +54,7 @@ class ESP(db.Model):
     score = db.Column(db.Integer)
     data = db.Column(db.String(300))
     xpath = db.Column(db.String(500), index=True)
+    requires_one = db.Column(db.String(500))
     is_qual = db.Column(db.Boolean)
     equal_elements = db.relationship('ESP',
                                      secondary = esp_groups,
@@ -55,10 +68,11 @@ class ESP(db.Model):
                                backref=db.backref('qual_children', lazy = 'dynamic'),
                                lazy='dynamic')
 
-    def __init__(self, xpath, score, data, qual=False):
+    def __init__(self, xpath, score, data, requires_one, qual=False):
         self.score = score
         self.xpath = xpath
         self.data = data
+        self.requires_one = requires_one
         self.is_qual = qual
 
     #Check to see whether an esp is already in the database
@@ -155,18 +169,22 @@ class ESP(db.Model):
 class Scenario(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(65), index=True, unique=True)
+    schema = db.Column(db.String(100))
     description = db.Column(db.String(200))
     doctype = db.Column(db.String(55))
+    fulfillmenttype = db.Column(db.String(100))
     date_created = db.Column(db.DateTime)
     date_updated = db.Column(db.DateTime)
     esps = db.relationship('ESP', secondary=contains, primaryjoin=(contains.c.scenario_id == id),
                            backref=db.backref('scenarios', lazy='dynamic'))
 
-    def __init__(self, name, description, doctype = '000'):
+    def __init__(self, name, schema, description, fulfillmenttype, doctype='000'):
         if not Scenario.check_exists(name):
             self.name = name
+            self.schema = schema
             self.description = description
             self.doctype = doctype
+            self.fulfillmenttype = fulfillmenttype
             self.date_created = datetime.datetime.now()
             self.date_updated = datetime.datetime.now()
 
@@ -474,3 +492,7 @@ def add_info(app_id, ip_address, ptime, err, m):
         db.session.add(t)
         db.session.commit()
         return t
+
+
+if __name__ == '__main__':
+    manager.run()
