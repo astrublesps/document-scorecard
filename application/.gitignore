@@ -2,7 +2,7 @@ flask/
 __pycache__/
 .idea/
 *.iml
-ALL_UPLOADS/
+app/ALL_UPLOADS/
 /app/SCHEMAS/*.xsd
 SCHEMAS/*.xsd
 dsc_log/
