@@ -3,7 +3,7 @@ angular.module("myApp").factory('scenariosFactory', ['$http', function ($http) {
 
     return {
         getScenarioList: function () {
-            return $http.get("get_scenario_list")
+            return $http.get("get_scenarios")
         },
         createScenario: function (scenarioData) {
             return $http.post("create_scenario", scenarioData)

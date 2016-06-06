@@ -1,0 +1,66 @@
+<OrderAck>
+    <Meta>
+        <SenderUniqueID>9999999999</SenderUniqueID>
+        <SenderCompanyName>Test Company 1</SenderCompanyName>
+        <ReceiverUniqueID>000000000</ReceiverUniqueID>
+        <ReceiverCompanyName>SPS Commerce</ReceiverCompanyName>
+        <IsDropShip>true</IsDropShip>
+        <InterchangeControlNumber>111111111</InterchangeControlNumber>
+        <GroupControlIdentifier>55555555</GroupControlIdentifier>
+        <GroupControlNumber>2222222</GroupControlNumber>
+        <DocumentControlIdentifier>1111111222222</DocumentControlIdentifier>
+        <DocumentControlNumber>4444444444444</DocumentControlNumber>
+    </Meta>
+    <Header>
+        <OrderHeader>
+            <TradingPartnerId>000ALLTESTID</TradingPartnerId>
+            <PurchaseOrderNumber>1010101010101</PurchaseOrderNumber>
+            <TsetPurposeCode>05</TsetPurposeCode>
+            <PurchaseOrderTypeCode>OS</PurchaseOrderTypeCode>
+            <POTypeDescription>This is a test. Do not ship</POTypeDescription>
+            <PurchaseOrderDate>2013-08-29</PurchaseOrderDate>
+            <PurchaseOrderTime>21:05:49-06:00</PurchaseOrderTime>
+            <ReleaseNumber>XYZ999999</ReleaseNumber>
+            <AcknowledgementNumber>977650397</AcknowledgementNumber>
+            <AcknowledgementType>AP</AcknowledgementType>
+            <ShipCompleteCode>N</ShipCompleteCode>
+        </OrderHeader>
+        <Date>
+            <DateTimeQualifier1>067</DateTimeQualifier1>
+            <Date1/>
+            <Time1>16:13:03-05:00</Time1>
+            <DateTimePeriod>testDateTimePeriod</DateTimePeriod>
+        </Date>
+    </Header>
+    <LineItems>
+        <LineItem>
+            <OrderLine>
+                <LineSequenceNumber>08</LineSequenceNumber>
+                <ApplicationId>980023</ApplicationId>
+                <BuyerPartNumber>9999-SPS</BuyerPartNumber>
+                <VendorPartNumber>11155-559999</VendorPartNumber>
+                <ConsumerPackageCode>093597609541</ConsumerPackageCode>
+                <EAN>1234567890123</EAN>
+                <GTIN>12345678901234</GTIN>
+                <UPCCaseCode>98765432101</UPCCaseCode>
+                <NatlDrugCode>51456-299</NatlDrugCode>
+                <InternationalStandardBookNumber>999-0-555-22222-0</InternationalStandardBookNumber>
+                <ProductID>
+                    <PartNumberQual>BO</PartNumberQual>
+                    <PartNumber>ABC-456789</PartNumber>
+                </ProductID>
+            </OrderLine>
+            <Date>
+                <DateTimeQualifier1>201</DateTimeQualifier1>
+                <Date1>2013-12-21</Date1>
+                <Time1>16:13:03-05:00</Time1>
+                <DateTimePeriod>testDateTimePeriod</DateTimePeriod>
+            </Date>
+        </LineItem>
+    </LineItems>
+    <Summary>
+        <TotalAmount>4058.92</TotalAmount>
+        <TotalLineItemNumber>3</TotalLineItemNumber>
+        <TotalQuantity>90</TotalQuantity>
+    </Summary>
+</OrderAck>

@@ -12,6 +12,9 @@ angular.module("myApp").factory('espsFactory', ['$rootScope', '$http', function 
         getEspList: function (espData) {
             return $http.post("get_esps", espData, headerInfo)
         },
+        getEspList2: function (espData) {
+            return $http.post("get_esps2", espData, headerInfo)
+        },
         addEsp: function (espData) {
             return $http.post("add_esp", espData, headerInfo)
         },

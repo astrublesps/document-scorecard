@@ -10,9 +10,9 @@ class order:
         if _file and schema:
             xsd = app.config['SCHEMA_FOLDER']+'/'+schema+'.xsd'
             print(xsd)
-            configure_xsd = True  # schemaCreation.create.configure_xsd(xsd)
+            configure_xsd = True # schemaCreation.create.configure_xsd(xsd)
             if configure_xsd:
-                create_schema = True  # schemaCreation.create.create_schema(xsd)
+                create_schema = schemaCreation.create.create_schema(xsd)
                 if create_schema:
                     return order.print_xml(_file)
         return False

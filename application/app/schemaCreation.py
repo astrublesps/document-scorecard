@@ -19,7 +19,7 @@ class create:
         f.close()
         for regex, replacement in REGEX.items():
             s = re.compile(regex, re.DOTALL)
-            file_string = re.sub(regex, replacement, file_string)
+            file_string = re.sub(s, replacement, file_string)
         file_string = create.remove_empty_lines(file_string)
         # add_attributes()
         file_string = re.sub('</xs:schema>', create.add_attributes() + '\n</xs:schema>', file_string)
@@ -31,17 +31,19 @@ class create:
     @staticmethod
     def add_attributes():
         attribs = ''
-        ATTRIBUTE_TYPES = {'integer', 'string', 'date', 'decimal', 'boolean', 'date', 'time'}
+        ATTRIBUTE_TYPES = {'string'}
+        # Possibilities of expanding to be able to validate types
+        # ATTRIBUTE_TYPES = {'integer', 'string', 'date', 'decimal', 'boolean', 'date', 'time'}
         ATTRIBUTES = {'score': 'int', 'qualified-rep': 'string', 'requires-one': 'string', 'not-equal': 'string',
                       'requires-others': 'string'}
         for attribtypes in ATTRIBUTE_TYPES:
-            attribs = '<xs:complexType name = "attributes-%s">\n<xs:simpleContent>\n<xs:extension base = "xs:%s">\n' \
+            attribs = '<xs:complexType name="attributes-%s">\n<xs:simpleContent>\n<xs:extension base="xs:%s">\n' \
                       % (attribtypes, attribtypes)
             for attribute, Att_type in ATTRIBUTES.items():
-                attribs += '<xs:attribute name = "%s" type = "xs:%s"' % (attribute, Att_type)
+                attribs += '<xs:attribute name="%s" type="xs:%s"' % (attribute, Att_type)
                 if attribute == 'score':
                     attribs += ' use="required"'
-                attribs += '> \n'
+                attribs += '/> \n'
             attribs += '</xs:extension>\n</xs:simpleContent>\n</xs:complexType>'
         # print(attribs)
         # print("add_attributes--- %s seconds ---" % (time.time() - start_time))
@@ -61,9 +63,9 @@ class create:
         _super = string_o
         xsd_name = xsd
         generateDS_path = app.config['GENERATEDS_FOLDER']
+        print('creating schema')
         os.system('python %s/generateDS.py -f -o %s %s'
                   % (generateDS_path, _object, xsd_name))
-        print('creating schema')
         # os.system('python ..\generateDS-2.22a0\generateDS.py -f -o %s -s %s --super="%s" %s'
         #           % (_object, sub_object, _super, xsd_name))
         return True

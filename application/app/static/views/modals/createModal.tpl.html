@@ -40,12 +40,8 @@
                 <div class="large-4 small-4 columns">
                     <label class="required">
                         Doc Type
-                        <select name="singleSelect" ng-model="newScenario.docType">
-                            <option value="810">810</option>
-                            <option value="846">846</option>
-                            <option value="850">850</option>
-                            <option value="855">855</option>
-                            <option value="856">856</option>
+                        <select name="singleSelect" ng-model="newScenario.doctype">
+                            <option ng-repeat="docType in docTypeOptions" value="{[ docType ]}">{[ docType ]}</option>
                         </select>
                     </label>
                 </div>
@@ -63,12 +59,11 @@
                 <div class="large-4 small-4 columns">
                     <label title="Fulfillment Type">
                         Fulfillment Type
-                        <select name="singleSelect" ng-model="newScenario.fulfillmentType">
-                            <option value="Bulk Import">Bulk Import</option>
-                            <option value="Drop Ship">Drop Ship</option>
-                            <option value="Multi Store">Multi Store</option>
-                            <option value="Cross Dock">Cross Dock</option>
-                            <option value="Multiple">Multiple</option>
+                        <select name="singleSelect" ng-model="newScenario.fulfillmenttype">
+                            <option value="">None</option>
+                            <option ng-repeat="fulfillmentType in fulfillmentTypeOptions" value="{[ fulfillmentType ]}">
+                                {[ fulfillmentType ]}
+                            </option>
                         </select>
                     </label>
                 </div>
@@ -86,7 +81,7 @@
         </li>
         <li>
             <button ng-click="closeModal()" class="confirm"
-                    ng-disabled="!newScenario.name || !newScenario.description || !newScenario.docType">
+                    ng-disabled="!newScenario.name || !newScenario.description || !newScenario.doctype">
                 Create scenario
             </button>
         </li>

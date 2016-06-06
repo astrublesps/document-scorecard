@@ -1,4 +1,5 @@
 import os
+
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 # configuration file for the app. This is where the upload folder and database are set globally.
@@ -22,9 +23,9 @@ BASE_FOLDER = basedir
 # UPLOAD_FOLDER = 'C:/Uploads'
 # SCHEMA_FOLDER = 'C:/Schemas'
 if os.environ.get('DATABASE_URL') is None:
-   SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'app.db')
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'app.db')
 else:
-   SQLALCHEMY_DATABASE_URI = os.environ['DATABASE_URL']
+    SQLALCHEMY_DATABASE_URI = os.environ['DATABASE_URL']
 # -------------------------------------------------------------------------------
 
 SQLALCHEMY_MIGRATE_REPO = os.path.join(basedir, 'db_repository')

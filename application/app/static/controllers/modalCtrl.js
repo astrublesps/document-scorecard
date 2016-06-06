@@ -3,8 +3,11 @@ angular.module('myApp').controller('modalCtrl', ['$scope', '$modalInstance', '$s
     function ($scope, $modalInstance, $state, scenario, action, schemas) {
         $scope.newScenario = angular.copy(scenario);
         $scope.scenario = scenario;
-        console.log(schemas);
         $scope.schemas = schemas;
+        //holds the options for the drop down menus
+        $scope.docTypeOptions = ['810', '846', '850', '855', '856'];
+        $scope.fulfillmentTypeOptions = ['Bulk Import', 'Drop Ship', 'Multi Store', 'Cross Dock', 'Multiple'];
+
         console.log(schemas);
 
         $scope.closeModal = function () {

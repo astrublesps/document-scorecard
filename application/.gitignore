@@ -4,9 +4,9 @@ __pycache__/
 *.iml
 app/ALL_UPLOADS/
 /app/SCHEMAS/*.xsd
+/app/*.backup.py
 SCHEMAS/*.xsd
 dsc_log/
-/app/*.xml
 application/app/static/bower_components/
 /*.xml
 node_modules/

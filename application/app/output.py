@@ -65,76 +65,63 @@ class Output:
             return "Error: " + error
         else:
             return output
-
+# TODO figure this mess out!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     #method to turn all the xpaths, scores, and data from a scenario back into an etree with all fields as children of their
     #correct groups and groups as children of their correct groups
     #the etree is sent back to views.py where it gets downloaded as a text file
+    @staticmethod
     def get_scenario_as_xml_tree(scen_name):
         if models.Scenario.check_exists(scen_name):
             scen = models.Scenario.get_scenario(scen_name)
-            esps = scen.get_esps()
+            esps = models.Scenario.get_esps_as_list(scen)
+            print(esps)
             first = esps[0]
-            splits = first.xpath.split('/')
-            Output.root = etree.Element(splits[1])
-            Output.tree = etree.ElementTree(Output.root)
+            print(first)
+            # splits = first.xpath.split('/')
+            # print(splits)
+            # Output.root = etree.Element(splits[1])
+            # print(Output.root)
+            # Output.tree = etree.ElementTree(Output.root)
+            # print(Output.tree)
             
             #for each of the esps in the scenario's list of esps, add the esp at the correct place in the etree
-            for esp in esps:
-                Output.add_esp(esp)
-                #if the ESP is a qualifier, we have to get all its children and add them to only this particular repetition of this group
-                if esp.is_qualifier():
-                    #if there is more than one of this group, find the correct group by matching data
-                    for leaf in Output.tree.xpath('/' + esp.xpath):
-                        if leaf.text==esp.data+"[qualified rep]"+' '+str(esp.score)+ ' ':
-                            parent = leaf.getparent()
-                            cs = esp.get_qual_children()
-                            children = []
-                            groups = []
-                            #reorder fields and groups contained inside a qualified rep so that fields come first and groups show up at the bottom
-                            for c in cs:
-                                if '/' in re.sub(Output.get_containing_group(esp.xpath)+'/',"",c.xpath):
-                                    groups.append(c)
-                                else:
-                                    children.append(c)
-                            children.extend(groups)
-                            #don't add the esp to the group again
-                            if esp in children:
-                                children.remove(esp)
-                            #add all the required fields and other qualifiers to the same group as the initial qualifier
-                            for child in children:
-                                child_name = re.sub(Output.get_containing_group(esp.xpath)+'/', "", child.xpath)
-                                field = Output.add_child(child_name, parent)
-                                field.text = child.data +("[qualified rep]" if child.is_qualifier() else "") + ' %s '%str(child.score)
-        return etree.tostring(Output.root, pretty_print=True)
+            # for esp in esps:
+            #     print(esp)
+            #     Output.add_esp(esp)
+            # return etree.tostring(Output.root, pretty_print=True)
 
     #helper method - checks an individual ESP to see if additional information should be added, and places that and the score in
     # the field's text in xml output
+    @staticmethod
     def add_esp(esp):
+        print('add_esp')
+        print(Output.parse_xpath(esp.xpath, esp.data))
         field = Output.parse_xpath(esp.xpath, esp.data)
-        txt = ''
-        if esp.data is not None and len(esp.data) > 0:
-            txt += esp.data
-            if esp.is_qualifier():
-                txt += "[qualified rep]"
-        if esp.has_equals():
-            txt += "[equivalent field]"
-        txt += ' %s ' % str(esp.score)
-        field.text = txt
+        print(field)
+        field.text = esp.data
+        print(field.text)
+        # field.score = esp.score
 
     #helper method - parses out the xpath string from an ESP and figures out where in the tree the ESP belongs
     #if a child group doesn't exist already, it will create it and add it to the etree
+    @staticmethod
     def parse_xpath(xpath, data):
+        print('parse_xpath')
         node_names = xpath.split('/')
+        print(node_names)
         parent = Output.root
+        print(parent)
+        print(node_names[2:])
         for name in node_names[2:]:
+            print(name)
             if len(name) > 0:
                 if parent.find(name) is None:
                     new_child = etree.SubElement(parent, name)
 
                 # if there are multiple qualified reps of the same group, this part will catch them and make sure each 
                 # one gets created
-                elif (name==node_names[-1]) and ((len(data) > 0 and parent.find(name).text is None) or 
-                    (len(data)>0 and parent.find(name).text is not None and not parent.find(name).text.startswith(data))):
+                elif (name == node_names[-1]) and ((len(data) > 0 and parent.find(name).text is None) or
+                    (len(data) > 0 and parent.find(name).text is not None and not parent.find(name).text.startswith(data))):
                     parent = etree.SubElement(parent.getparent(), parent.tag)
                     new_child = etree.SubElement(parent, name)
                 parent = parent.find(name)
