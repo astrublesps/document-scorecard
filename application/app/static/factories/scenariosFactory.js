@@ -1,5 +1,4 @@
 angular.module("myApp").factory('scenariosFactory', ['$http', function ($http) {
-    var scenariosFactory = [];
 
     return {
         getScenarioList: function () {
@@ -9,8 +8,11 @@ angular.module("myApp").factory('scenariosFactory', ['$http', function ($http) {
             return $http.post("create_scenario", scenarioData)
         },
         createScenarioFromFile: function (scenarioData) {
-            return $http.post("upload_new_scenario", scenarioData,{ headers: {
-                    'Content-Type': undefined}})
+            return $http.post("upload_new_scenario", scenarioData, {
+                headers: {
+                    'Content-Type': undefined
+                }
+            })
         },
         deleteScenario: function (scenarioData) {
             return $http.post("delete_scenario", scenarioData)
@@ -25,8 +27,11 @@ angular.module("myApp").factory('scenariosFactory', ['$http', function ($http) {
             return $http.post("download_esp_list", scenarioData)
         },
         compareAndDownload: function (scenarioData) {
-            return $http.post("compare_download", scenarioData,{ headers: {
-                    'Content-Type': undefined}})
+            return $http.post("compare_download", scenarioData, {
+                headers: {
+                    'Content-Type': undefined
+                }
+            })
         }
     };
 }]);

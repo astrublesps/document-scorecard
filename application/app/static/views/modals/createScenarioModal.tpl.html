@@ -5,25 +5,6 @@
     </header>
     <ul class="fa-ul">
         <li>
-            <div class="droparea" drag-drop>
-                <div class="row">
-                    <input type="file" ng-model-instant id="fileToUpload"
-                           onchange="angular.element(this).scope().setFiles(this)"/>
-                </div>
-                <div id="dropbox" ng-hide="files.length" class="dropbox"><span>{[dropText]}</span></div>
-                <div ng-show="files.length">
-                    <div ng-repeat="file in files.slice(0)">
-                        <span>{[file.webkitRelativePath || file.name]}</span>
-                        (<span ng-switch="file.size > 1024*1024">
-                      <span ng-switch-when="true">{[file.size / 1024 / 1024 | number:2]} MB</span>
-                      <span ng-switch-default>{[file.size / 1024 | number:2]} kB</span>
-                  </span>)
-                    </div>
-                </div>
-            </div>
-            <span style="font-size: .8em"><strong>Note</strong>: Files must be .xml. Do not upload a file if you wish to create a blank scenario.</span>
-        </li>
-        <li>
             <div>
                 <label class="required">
                     Scenario
@@ -47,11 +28,9 @@
                 </div>
                 <div class="large-10 small-10 columns">
                     <label title="Required to download a scenario">
-                        Schema association
-                        <select name="singleSelect" ng-model="newScenario.schema">
-                            <option value="">None</option>
-                            <option ng-repeat="schema in schemas" value="{[ schema.name ]}">{[ schema.name ]}</option>
-                        </select>
+                        Root Name
+                        <input type="text" placeHolder="Root Name is required if file is not uploaded..."
+                               ng-model="newScenario.rootName">
                     </label>
                 </div>
             </div>
@@ -68,8 +47,35 @@
                     </label>
                 </div>
                 <div class="large-10 small-10 columns">
+                    <label title="Required to download a scenario">
+                        Schema association
+                        <select name="singleSelect" ng-model="newScenario.schema">
+                            <option value="">None</option>
+                            <option ng-repeat="schema in schemas" value="{[ schema.name ]}">{[ schema.name ]}</option>
+                        </select>
+                    </label>
                 </div>
             </div>
+        </li>
+        <li>
+            <div class="droparea" drag-drop>
+                <div class="row">
+                    <input type="file" ng-model-instant id="fileToUpload"
+                           onchange="angular.element(this).scope().setFiles(this)"/>
+                </div>
+                <div id="dropbox" ng-hide="files.length" class="dropbox"><span>{[dropText]}</span></div>
+                <div ng-show="files.length">
+                    <div ng-repeat="file in files.slice(0)">
+                        <span>{[file.webkitRelativePath || file.name]}</span>
+                        (<span ng-switch="file.size > 1024*1024">
+                      <span ng-switch-when="true">{[file.size / 1024 / 1024 | number:2]} MB</span>
+                      <span ng-switch-default>{[file.size / 1024 | number:2]} kB</span>
+                  </span>)
+                    </div>
+                </div>
+            </div>
+            <span style="font-size: .8em"><strong>Note</strong>: Files must be .xml. Do not upload a file if you wish to create a blank scenario.</span>
+
         </li>
     </ul>
     <ul class="form-actions">
@@ -81,7 +87,7 @@
         </li>
         <li>
             <button ng-click="closeModal()" class="confirm"
-                    ng-disabled="!newScenario.name || !newScenario.description || !newScenario.doctype">
+                    ng-disabled="!newScenario.name || !newScenario.description || !newScenario.doctype || (!newScenario.rootName && !files)">
                 Create scenario
             </button>
         </li>

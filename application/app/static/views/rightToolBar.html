@@ -1,15 +1,16 @@
 <div class="col-xs-5">
-  <div class="input-group input-group-sm" ng-hide="hideRightSearch">
+    <div class="input-group input-group-sm" ng-hide="hideRightSearch">
     <span class="input-group-addon" bs-icon="search">
       <span class="glyphicon glyphicon-search"></span>
     </span>
-    <input type="search" id="scenarioFilter" class="file-browser-search form-control" placeholder="Filter ESPs..."
-      ng-model="espFilter.filter"/>
-    <span class="input-group-addon pointer-cursor" ng-click="espFilter.filter = ''" title="Clear filter" bs-icon="remove">
+        <input type="search" id="scenarioFilter" class="file-browser-search form-control" placeholder="Filter ESPs..."
+               ng-model="espFilter.filter"/>
+    <span class="input-group-addon pointer-cursor" ng-click="espFilter.filter = ''" title="Clear filter"
+          bs-icon="remove">
       <span class="glyphicon glyphicon-remove"></span>
     </span>
-  </div>
-  <div class="input-group input-group-sm" ng-hide="hideUpload">
+    </div>
+    <div class="input-group input-group-sm" ng-hide="hideUpload">
     <span>
       <button class="button" ng-click="openModal('upload', '')" title="Upload a file to test against">
         <i class="fa fa-cloud-upload fa-lg" ng-hide="fileUploaded"></i>
@@ -17,22 +18,35 @@
          {[fileUploaded ? 'Test File Uploaded' : 'Upload Test File' ]}
       </button>
     </span>
-  </div>
+    </div>
 </div>
 <div class="col-xs-3">
-  <div class="input-group input-group-sm" ng-hide="hideAddESP">
+    <div class="input-group input-group-sm" ng-hide="hideAddField">
     <span>
-      <button class="button" ng-click="openModal('addESP', scenario)" title="Create a new ESP" ng-disabled="selectedScenario == ''">
+      <button class="button" ng-click="openModal('addField', scenario)" title="Create a new field"
+              ng-disabled="selectedScenario == ''">
         <i class="fa fa-plus"></i>
-         XPath
+         Field
       </button>
     </span>
-  </div>
-  <div class="input-group input-group-sm" ng-hide="hideTestButton">
-    <button class="key" title="Run Test" ng-click="compareAndDownload()" ng-disabled="scenariosTestList == '' || !fileUploaded">
-       Run Test
-    </button>
-  </div>
+    </div>
+</div>
+<div class="col-xs-3">
+    <div class="input-group input-group-sm" ng-hide="hideAddGroup">
+    <span>
+      <button class="button" ng-click="openModal('addGroup', scenario)" title="Create a new group"
+              ng-disabled="selectedScenario == ''">
+        <i class="fa fa-plus"></i>
+         Group
+      </button>
+    </span>
+    </div>
+    <div class="input-group input-group-sm" ng-hide="hideTestButton">
+        <button class="key" title="Run Test" ng-click="compareAndDownload()"
+                ng-disabled="scenariosTestList == '' || !fileUploaded">
+            Run Test
+        </button>
+    </div>
 </div>
 <div class="toolbar-right">
   <span class="table-actions">

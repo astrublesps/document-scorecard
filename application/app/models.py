@@ -7,6 +7,8 @@ from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.script import Manager
 from flask.ext.migrate import Migrate, MigrateCommand
 
+
+# this info is used to migrate and update the database tables
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
 
@@ -16,57 +18,141 @@ migrate = Migrate(app, db)
 manager = Manager(app)
 manager.add_command('db', MigrateCommand)
 
-# contains is relationship table for the many-to-many relationship between ESPs and Scenarios
-# it has foreign keys for the esps and for the scenarios
-contains = db.Table('contains',
-                    db.Column('esp_id', db.Integer, db.ForeignKey('ESP.id')),
-                    db.Column('scenario_id', db.Integer, db.ForeignKey('scenario.id'))
-                    )
+# ==============================SCENARIO_GROUPS====================================================
+# this table will keep track of which groups are in each scenario
+scenario_groups = db.Table('scenario_groups',
+                           db.Column('group_id', db.Integer, db.ForeignKey('group.id')),
+                           db.Column('scenario_id', db.Integer, db.ForeignKey('scenario.id'))
+                           )
+
+# ==============================GROUP_FIELDS====================================================
+# This will be the many-to-many relationship between groups and fields
+group_fields = db.Table('group_fields',
+                        db.Column('field_id', db.Integer, db.ForeignKey('field.id')),
+                        db.Column('group_id', db.Integer, db.ForeignKey('group.id'))
+                        )
 
 
-# ESP is the table for the esps. It has id (used for the database), score, xpath, and data columns
-# For esps, the combination of xpath, score, and data is unique in the table. This is for efficiency, since there are
-# only 5 possible scores, there is likely to be a lot of overlap in the esps that scenarios contain.
-class ESP(db.Model):
+# ==============================FIELDS====================================================
+class Field(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(500), index=True)
     score = db.Column(db.Integer)
     data = db.Column(db.String(300))
-    xpath = db.Column(db.String(500), index=True)
+    not_equal = db.Column(db.Boolean)
 
-    def __init__(self, xpath, score, data):
+    def __init__(self, name, score, data, not_equal):
+        self.name = name
         self.score = score
-        self.xpath = xpath
         self.data = data
+        self.not_equal = not_equal
 
-    # Check to see whether an esp is already in the database
+    # Check to see whether a field is already in the database
     @staticmethod
-    def esp_exists(xpath, score, data):
-        return ESP.query.filter(ESP.xpath == xpath, ESP.score == score,
-                                ESP.data == data).first() is not None
+    def field_exists(name, score, data, not_equal):
+        return Field.query.filter(Field.name == name, Field.score == score,
+                                  Field.data == data, Field.not_equal == not_equal).first() is not None
 
-    # Return an esp given its score and xpath
+    # Return a field given its name, score, data, and not_equal boolean
     @staticmethod
-    def get_esp(xpath, score, data):
-        return ESP.query.filter(ESP.xpath == xpath, ESP.score == score, ESP.data == data).first()
+    def get_field(name, score, data, not_equal):
+        return Field.query.filter(Field.name == name, Field.score == score, Field.data == data,
+                                  Field.not_equal == not_equal).first()
 
     # remove a particular esp from the database
-    def delete_esp(self, name):
-        esp = ESP.query.filter_by(self.name == name)
-        db.session.delete(esp)
+    def delete_field(self, name):
+        field = Field.query.filter_by(self.name == name)
+        db.session.delete(field)
         db.session.commit()
 
-    # ToString method for an esp
+    # ToString method for a field
     def __repr__(self):
-        return '<ESP %r>' % (str(self.id) + " " + self.xpath + " " + str(self.score) + " " + str(self.data))
+        return '<Field %r>' % (str(self.id) + " | " + self.name + " | " +
+                               str(self.score) + " | " + str(self.data) + " | " + self.not_equal)
 
     def serialize(self):
         return {'id': self.id,
-                'xpath': self.xpath,
+                'name': self.name,
                 'score': self.score,
                 'data': self.data
                 }
 
 
+# ==============================GROUPS=============================================================
+# each scenario will have a set of groups like this, each group will have a set of fields
+class Group(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(500), index=True)
+    qualifier_field = db.Column(db.String(100))
+    scenario_groups = db.relationship('Group', secondary=scenario_groups,
+                                   primaryjoin=(scenario_groups.c.group_id == id),
+                                   backref=db.backref('groups', lazy='dynamic'))
+    child_fields = db.relationship('Field', secondary=group_fields,
+                                   primaryjoin=(group_fields.c.group_id == id),
+                                   backref=db.backref('fields', lazy='dynamic'))
+
+    def __init__(self, name, qualifier_field):
+        self.name = name
+        self.qualifier_field = qualifier_field
+
+    # Check to see whether a group is already in the database
+    @staticmethod
+    def group_exists(group_id):
+        return Group.query.filter(Group.id == group_id).first() is not None
+
+    # Return a group given its id
+    @staticmethod
+    def get_group(group_id):
+        return Group.query.filter(Group.id == group_id).first()
+
+    # Method to check whether a group exists before creating it, create it, and commit it
+    @staticmethod
+    def create_group(name):
+        if not Group.group_exists(name):
+            group = Group(name, '')
+            db.session.add(group)
+            db.session.commit()
+            return group
+        else:
+            return None
+
+    # remove a particular group from the database
+    def edit_group(self, name):
+        self.name = name
+
+    # Return a specific Field for this group
+    def get_single_field(self, name, score, data, not_equal):
+        return Group.query.join(group_fields).filter(group_fields.c.group_id == self.id, Field.name == name,
+                                                     Field.score == score, Field.data == data,
+                                                     Field.not_equal == not_equal).first()
+
+    # Return all Fields for this group
+    def get_fields(self):
+        return Group.query.join(group_fields).filter(group_fields.c.group_id == self.id).first()
+
+    def add_field(self, field):
+        self.group_fields.append(field)
+        db.session.commit()
+        return field
+
+    def remove_field(self, field):
+        self.esps.remove(field)
+        db.session.commit()
+
+    # ToString method for a field
+    def __repr__(self):
+        return '<Group %r | %r | %r | %r | %r>' % (
+            str(self.id), self.name, self.qualifier_field, self.scenario_groups, self.child_fields)
+
+    def serialize(self):
+        return {'id': self.id,
+                'name': self.name,
+                'qualifier_field': self.qualifier_field,
+                'child_groups': self.scenario_groups
+                }
+
+
+# ==============================SCENARIOS==========================================================
 # Scenario is the table for scenarios. Each scenario has a unique name, non-unique description, and a relationship with
 # zero or more esps through the contains table.
 class Scenario(db.Model):
@@ -78,61 +164,49 @@ class Scenario(db.Model):
     fulfillmenttype = db.Column(db.String(100))
     date_created = db.Column(db.DateTime)
     date_updated = db.Column(db.DateTime)
-    esps = db.relationship('ESP', secondary=contains, primaryjoin=(contains.c.scenario_id == id),
-                           backref=db.backref('scenarios', lazy='dynamic'))
+    root_node = db.Column(db.String(200))
+    scenario_groups = db.relationship('Group', secondary=scenario_groups,
+                                   primaryjoin=(scenario_groups.c.scenario_id == id),
+                                   backref=db.backref('scenarios', lazy='dynamic'))
 
-    def __init__(self, name, schema, description, doctype, fulfillmenttype):
-        if not Scenario.check_exists(name):
+    def __init__(self, name, schema, description, doctype, fulfillmenttype, root_node):
+        if not Scenario.scenario_exists(name):
             self.name = name
             self.schema = schema
             self.description = description
             self.doctype = doctype
             self.fulfillmenttype = fulfillmenttype
+            self.root_node = root_node
             self.date_created = Scenario.get_current_time()
             self.date_updated = Scenario.get_current_time()
 
     # Check to see if a scenario exists, given its name
     @staticmethod
-    def check_exists(check_name):
+    def scenario_exists(check_name):
         return Scenario.query.filter_by(name=check_name).first() is not None
 
     # Get a particular scenario from the database, given its name
     @staticmethod
     def get_scenario(scen_name):
-        if Scenario.check_exists(scen_name):
+        if Scenario.scenario_exists(scen_name):
             return Scenario.query.filter_by(name=scen_name).first()
 
-    # Return esps related to a specific scenario as esps, or objects, so that they can be manipulated
+    # Return groups (which will return fields) related to a specific scenario so that they can be manipulated
     # Used in the Compare and ScenarioList classes
-    def get_esps(self):
-        return ESP.query.join(contains).filter(contains.c.scenario_id == self.id).order_by(asc(ESP.xpath)).all()
+    def get_groups(self):
+        return Group.query.join(scenario_groups).filter(scenario_groups.c.scenario_id == self.id).order_by(
+            asc(Group.name)).all()
 
     # Return a particular esp related to a specific scenario
-    def get_single_esp_for_scen(self, xpath, score, data):
-        return ESP.query.join(contains).filter(contains.c.scenario_id == self.id, ESP.xpath == xpath,
-                                               ESP.score == score, ESP.data == data).first()
-
-    # Return a specific ESP for this scenario, but without checking score (since there should only be one score for any given
-    # xpath/data combo, e.g. AddressTypeCode where data is ST can only have one score per scenario. Used in ScenarioList.build_scenario()
-    def get_single_esp_no_score(self, g_xpath, g_data):
-        return ESP.query.join(contains).filter(contains.c.scenario_id == self.id, ESP.xpath == g_xpath,
-                                               ESP.data == g_data).first()
-
-    # Return esps related to a specific scenario as a list, so that they can be read
-    # Used in the ScenarioList class
-    def get_esps_as_list(self):
-        all_esps = ESP.query.join(contains).filter(contains.c.scenario_id == self.id).order_by(asc(ESP.xpath)).all()
-        list_of_esps = []
-        for esp in all_esps:
-            x = {'xpath': esp.xpath, 'data': esp.data, 'score': esp.score}
-            list_of_esps.append(x)
-        return list_of_esps
+    def get_single_group_for_scen(self,group_id):
+        return Group.query.join(scenario_groups).filter(scenario_groups.c.scenario_id == self.id,
+                                                        Group.id == group_id).first()
 
     # Method to check whether a scenario exists before creating it, create it, and commit it
     @staticmethod
-    def create_scenario(name, schema, new_description, doctype, fulfillmenttype):
-        if not Scenario.check_exists(name):
-            scen = Scenario(name, schema, new_description, doctype, fulfillmenttype)
+    def create_scenario(name, schema, new_description, doctype, fulfillmenttype, root_node):
+        if not Scenario.scenario_exists(name):
+            scen = Scenario(name, schema, new_description, doctype, fulfillmenttype, root_node)
             db.session.add(scen)
             db.session.commit()
             return scen
@@ -142,22 +216,14 @@ class Scenario(db.Model):
     # Method to check that a scenario exists, delete, and commit the change
     @staticmethod
     def delete_scenario(name):
-        if Scenario.check_exists(name):
+        if Scenario.scenario_exists(name):
             del_scen = Scenario.get_scenario(name)
-            print(del_scen.id)
-            print(ESP.query.join(contains).all())
-            esps_to_delete = ESP.query.join(contains).filter(contains.c.scenario_id == del_scen.id).all()
+            esps_to_delete = Group.query.join(scenario_groups).filter(
+                scenario_groups.c.scenario_id == del_scen.id).all()
             for esp in esps_to_delete:
-                print("delete esp" + str(esp))
                 del_scen.remove_esp(esp)
-                # db.session.delete(esp)
             db.session.delete(del_scen)
             db.session.commit()
-            # cleanup_esps = ESP.query.outerjoin(contains).filter(contains.c.scenario_id is None).all()
-            # # for esp in cleanup_esps:
-            #     # print("delete esp" + str(esp))
-            #     # db.session.delete(esp)
-            # print(ESP.query.join(contains).all())
             return True
         else:
             return False
@@ -173,70 +239,50 @@ class Scenario(db.Model):
         return True
 
     # Method to take most of the finicky stuff out of adding an esp - just pass in the name of the scenario, the
-    # xpath of the esp, and its score, and the method will take care of all the checks and things
+    # name of the esp, and its score, and the method will take care of all the checks and things
     @staticmethod
-    def public_add_esp(scen_name, xpath, score, data):
-        if Scenario.check_exists(scen_name):
+    def public_add_group(scen_name, group_name):
+        if Scenario.scenario_exists(scen_name):
             scen = Scenario.get_scenario(scen_name)
-            if ESP.esp_exists(xpath, score, data):
-                curr = ESP.get_esp(xpath, score, data)
+            if Group.group_exists(group_name):
+                curr = Group.get_group(group_name)
             else:
-                curr = ESP(xpath, score, data)
-            scen.add_esp(curr)
-            return True
+                curr = Group(group_name, '')
+            group = scen.add_group(curr)
+            if group:
+                return True, group
+            else:
+                return False, 'Unable to add group %s to scenario %s' % (group_name, scen_name)
         else:
-            return False
+            return False, '%s no longer exists as a scenario' % scen_name
 
-
-    # Method to take the work out of removing an esp from a scenario- pass in the scenario name and the xpath of the esp
+    # Method to take the work out of removing an esp from a scenario- pass in the scenario name and the name of the esp
     # to remove. The method runs a query to get the specific esp that is related to the given scenario and then removes
     # it without deleting the esp itself, since it may be related to other scenarios
     @staticmethod
-    def public_remove_esp(scen_name, xpath, data, score):
-        if Scenario.check_exists(scen_name):
+    def public_remove_group(scen_name, group_id):
+        if Scenario.scenario_exists(scen_name):
             scen = Scenario.get_scenario(scen_name)
-            esp_to_remove = scen.get_single_esp_for_scen(xpath, score, data)
-            if esp_to_remove is not None:
-                scen.remove_esp(esp_to_remove)
+            group_to_remove = scen.get_single_group_for_scen(group_id)
+            if group_to_remove is not None:
+                scen.remove_group(group_to_remove)
                 scen.date_updated = Scenario.get_current_time()
                 return True, ''
             else:
-                return False, 'ESP %s no longer exists' % xpath
+                return False, 'Group %s no longer exists' % group_to_remove.name
         else:
             return False, '%s no longer exists as a scenario' % scen_name
 
-    # Method to allow editing an esp that a scenario already contains
-    @staticmethod
-    def edit_esp(scen_name, old_xpath, old_data, old_score, xpath, data, score):
-        if Scenario.check_exists(scen_name):
-            scen = Scenario.get_scenario(scen_name)
-            curr = scen.get_single_esp_for_scen(old_xpath, old_score, old_data)
-            # ESPs with equivalents get their own editing part since they are created specifically for each scenario
-            if curr is not None:
-                if ESP.esp_exists(xpath, score, data):
-                    scen.remove_esp(curr)
-                    curr = ESP.get_esp(xpath, score, data)
-                    scen.add_esp(curr)
-                # otherwise we must create the new ESP and then add it to the scenario
-                else:
-                    scen.remove_esp(curr)
-                    curr = ESP(xpath, score, data)
-                    scen.add_esp(curr)
-                scen.date_updated = Scenario.get_current_time()
-                return True, ''
-            else:
-                return False, 'ESP %s no longer exists' % xpath
-        else:
-            return False, '%s no longer exists as a scenario' % scen_name
-
-    def add_esp(self, esp):
-        self.esps.append(esp)
+    def add_group(self, group):
+        print(group)
+        self.scenario_groups.append(group)
         self.date_updated = Scenario.get_current_time()
         db.session.commit()
-        return esp
+        print(group)
+        return group
 
-    def remove_esp(self, esp):
-        self.esps.remove(esp)
+    def remove_group(self, group):
+        self.scenario_groups.remove(group)
         self.date_updated = Scenario.get_current_time()
         db.session.commit()
 
@@ -247,13 +293,16 @@ class Scenario(db.Model):
 
     # ToString method for scenarios
     def __repr__(self):
-        return "Scenario: %r %r %r %r" % (self.name, self.description, self.doctype, self.fulfillmenttype)
+        return "Scenario: %r | %r | %r | %r | %r | %r" % (
+            self.name, self.schema, self.description, self.doctype, self.fulfillmenttype, self.root_name)
 
     def serialize(self):
         return {'name': self.name,
+                'schema': self.schema,
                 'description': self.description,
                 'doctype': self.doctype,
-                'fulfillmenttype': self.fulfillmenttype
+                'fulfillmenttype': self.fulfillmenttype,
+                'root_name': self.root_name
                 }
 
     # formatting can be found here: http://www.saltycrane.com/blog/2008/06/how-to-get-current-date-and-time-in/

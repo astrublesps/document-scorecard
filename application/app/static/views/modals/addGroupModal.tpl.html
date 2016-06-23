@@ -1,0 +1,28 @@
+<div id="create-group-modal" class="reveal-modal open" data-reveal tabindex="0" aria-hidden="false"
+     style="display: block; opacity: 1; visibility: visible; top: 100px; max-height: 500px">
+    <header class="modal-title">
+        Create a Group
+    </header>
+    Adding a new group to {[ scenario.name ]}
+    <ul class="fa-ul">
+        <li>
+            <div>
+                <label class="required">
+                    Name
+                    <input type="text" placeHolder="enter a new xpath..." ng-model="newScenario.groupName">
+                </label>
+            </div>
+        </li>
+    </ul>
+    <ul class="form-actions">
+        <li>
+            <button class="button" ng-click="cancelModal()">Cancel</button>
+        </li>
+        <li>
+            <button class="confirm" ng-click="closeModal()" ng-disabled="!newScenario.groupName">
+                Finish
+            </button>
+        </li>
+    </ul>
+    <a class="close-reveal-modal" ng-click="cancelModal()">x</a>
+</div>
