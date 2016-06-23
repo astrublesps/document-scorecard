@@ -12,8 +12,9 @@
     <div class="large-1 small-16 columns panel toolbar hide-for-large hide-for-xlarge hide-for-xxlarge" ng-include="'views/rightToolBar.html'">
     </div>
     <div class="large-7 columns panel condensed table">
-    <div ng-hide="hideESPSTable" ng-include="'views/espsTable.html'">
-    <div ng-hide="hideESPSTextarea" ng-include="'views/editTable.html'">
+    <!--<div ng-hide="hideFieldsViewWindow" ng-include="'views/fieldsTable.old.html'">-->
+    <div ng-hide="hideFieldsView" ng-include="'views/fieldsView.html'">
+    <div ng-hide="hideFieldsTextarea" ng-include="'views/editTable.html'">
     </div>
     <div ng-hide="hideTestTable" ng-include="'views/scenariosTestTable.html'">
     </div>

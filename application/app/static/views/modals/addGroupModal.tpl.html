@@ -1,28 +1,15 @@
-<div id="create-field-modal" class="reveal-modal open" data-reveal tabindex="0" aria-hidden="false"
+<div id="create-group-modal" class="reveal-modal open" data-reveal tabindex="0" aria-hidden="false"
      style="display: block; opacity: 1; visibility: visible; top: 100px; max-height: 500px">
     <header class="modal-title">
-        Create a field
+        Create a Group
     </header>
-    Adding a new field to {[ scenario.name ]}
+    Adding a new group to {[ scenario.name ]}
     <ul class="fa-ul">
         <li>
             <div>
                 <label class="required">
-                    Xpath
-                    <input type="text" placeHolder="enter a new xpath..." ng-model="newScenario.xpath">
-                </label>
-            </div>
-            <div>
-                <label class="required">
-                    Score
-                    <input type="text" placeHolder="enter a new score (1-5, 5 = most important)..."
-                           ng-model="newScenario.score">
-                </label>
-            </div>
-            <div>
-                <label>
-                    Data
-                    <input type="text" placeHolder="enter a new data..." ng-model="newScenario.data">
+                    Name
+                    <input type="text" placeHolder="enter a new xpath..." ng-model="newScenario.groupName">
                 </label>
             </div>
         </li>
@@ -32,7 +19,7 @@
             <button class="button" ng-click="cancelModal()">Cancel</button>
         </li>
         <li>
-            <button class="confirm" ng-click="closeModal()" ng-disabled="!newScenario.xpath || !newScenario.score">
+            <button class="confirm" ng-click="closeModal()" ng-disabled="!newScenario.groupName">
                 Finish
             </button>
         </li>

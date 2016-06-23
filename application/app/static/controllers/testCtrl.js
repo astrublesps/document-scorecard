@@ -18,12 +18,13 @@ function testCtrl($scope, scenariosFactory, feedbackService, $uibModal) {
     $scope.hideRemove = true;
     $scope.hideCopy = true;
     $scope.hideEdit = true;
-    $scope.hideAddESP = true;
+    $scope.hideAddField = true;
+    $scope.hideAddGroup = true;
     $scope.hideRightSearch = true;
     $scope.hideCreate = true;
     $scope.hideSchema = true;
-    $scopehideESPSTable = true;
-    $scopehideESPSTextarea = true;
+    $scope.hideFieldsTable = true;
+    $scope.hideFieldsTextarea = true;
     $scope.hideCheckBox = true;
 
     //Initially loads the table of scenarios
@@ -65,7 +66,7 @@ function testCtrl($scope, scenariosFactory, feedbackService, $uibModal) {
             var fileDownload = angular.element('<a></a>');
             var fileName = data.fileName;
             fileDownload.attr('href', window.URL.createObjectURL(blob));
-            fileDownload.attr('download', $scope.selectedScenario.name + '-esp_list.txt');
+            fileDownload.attr('download', $scope.selectedScenario.name + '-field_list.txt');
             fileDownload[0].click();
             console.log(data);
         });
@@ -81,7 +82,7 @@ function testCtrl($scope, scenariosFactory, feedbackService, $uibModal) {
             var fileDownload = angular.element('<a></a>');
             var fileName = data.fileName;
             fileDownload.attr('href', window.URL.createObjectURL(blob));
-            fileDownload.attr('download', scenario.name + '-esp_list.txt');
+            fileDownload.attr('download', scenario.name + '-field_list.txt');
             fileDownload[0].click();
         });
     };
@@ -96,7 +97,7 @@ function testCtrl($scope, scenariosFactory, feedbackService, $uibModal) {
         }
     }
 
-    //track selected scenario row and get list of ESPs to build esp table from
+    //track selected scenario row and get list of fields to build field table from
     $scope.setSelectedScenario = function (scen) {
         if ($scope.selectedScenario.name != scen.name) {
             $scope.selectedScenario.isChecked = false; //remove old checkbox

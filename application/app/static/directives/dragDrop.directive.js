@@ -1,38 +1,38 @@
 angular.module("myApp").directive('dragDrop',function(){
     return function($scope, element){
       $scope.droparea = element[0];
-      $scope.dropText = 'Drop files here...'
+      $scope.dropText = 'Drop file here...'
 
       // init event handlers
       function dragEnterLeave(evt) {
         evt.stopPropagation()
         evt.preventDefault()
         $scope.$apply(function(){
-            $scope.dropText = 'Drop files here...'
+            $scope.dropText = 'Drop file here...';
             $scope.dropClass = ''
         })
       }
       $scope.droparea.addEventListener("dragenter", dragEnterLeave, false);
       $scope.droparea.addEventListener("dragleave", dragEnterLeave, false);
       $scope.droparea.addEventListener("dragover", function(evt) {
-        evt.stopPropagation()
-        evt.preventDefault()
-        var clazz = 'not-available'
-        var ok = evt.dataTransfer && evt.dataTransfer.types && evt.dataTransfer.types.indexOf('Files') >= 0
+        evt.stopPropagation();
+        evt.preventDefault();
+        var clazz = 'not-available';
+        var ok = evt.dataTransfer && evt.dataTransfer.types && evt.dataTransfer.types.indexOf('Files') >= 0;
         $scope.$apply(function(){
-            $scope.dropText = ok ? 'Drop files here...' : 'Only files are allowed!'
+            $scope.dropText = ok ? 'Drop file here...' : 'Only files are allowed!';
             $scope.dropClass = ok ? 'over' : 'not-available'
         })
       }, false)
       $scope.droparea.addEventListener("drop", function(evt) {
-        console.log('drop evt:', JSON.parse(JSON.stringify(evt.dataTransfer)))
+        console.log('drop evt:', JSON.parse(JSON.stringify(evt.dataTransfer)));
         evt.stopPropagation()
         evt.preventDefault()
         $scope.$apply(function(){
-            $scope.dropText = 'Drop files here...'
+            $scope.dropText = 'Drop file here...';
             $scope.dropClass = ''
         })
-        var files = evt.dataTransfer.files
+        var files = evt.dataTransfer.files;
         if (files.length > 0) {
             $scope.$apply(function(){
                 $scope.files = []
@@ -42,7 +42,7 @@ angular.module("myApp").directive('dragDrop',function(){
             })
         }
       }, false)
-    }
+    };
     //============== DRAG & DROP =============
       $scope.setFiles = function(element) {
       $scope.$apply(function($scope) {

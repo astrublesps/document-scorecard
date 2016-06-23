@@ -1,36 +1,67 @@
-<table class="table">
- <thead>
-   <tr>
-     <th width="55%" class="sortable" ng-click="fieldSortColumn = 'xpath'" ng-class="{active: fieldSortColumn == 'xpath'}">
-       Xpath
-     </th>
-     <th width="15%" class="sortable" ng-click="fieldSortColumn = 'data'" ng-class="{active: fieldSortColumn == 'data'}">
-       Data
-     </th>
-     <th width="15%" class="sortable" ng-click="fieldSortColumn = 'score'" ng-class="{active: fieldSortColumn == 'score'}">
-       Score
-     </th>
-     <th width="15%" class="txt-right">
-       Actions
-     </th>
-   </tr>
- </thead>
- <tbody>
-    <tr ng-repeat="field in fields | filter: espFilter.filter | orderBy: fieldSortColumn"
-        id="scenario.name-{[$index + 1]}">
-        <td>{[ field.xpath ]}</td>
-        <td>{[ field.data ]}</td>
-        <td>{[ field.score ]}</td>
-        <td class="actions txt-right">
-          <a class="no-border" title="edit ESP" ng-click="openModal('editField', field)">
-            <i class="fa fa-edit fa-lg"></i>
-          </a>
-          <a class="no-border" title="delete ESP" ng-click="openModal('removeField', field)">
-            <i class="fa fa-trash-o fa-lg"></i>
-          </a>
-        </td>
-    </tr>
- </tbody>
-</table>
+<div>
+    <div ng-repeat="scenario in selectedScenario">
+    {[ scenario.root_node ]}
+    <!--{[ scenario.groups ]}-->
+    {[ scenario.groups.name ]}
+    {[ scenario.groups.xpath ]}
+    {[ scenario.groups.qualifier ]}
+    {[ scenario.groups.child_groups ]}
+    {[ scenario.groups.fields ]}
+        <div ng-repeat="group in selectedScenario.groups">
+            {[ group.name ]}
+        </div>
+    </div>
+    <table class="table">
+        <thead>
+        <tr>
+            <th width="55%" class="sortable" ng-click="fieldSortColumn = 'xpath'"
+                ng-class="{active: fieldSortColumn == 'xpath'}">
+                Xpath
+            </th>
+            <th width="15%" class="sortable" ng-click="fieldSortColumn = 'data'"
+                ng-class="{active: fieldSortColumn == 'data'}">
+                Data
+            </th>
+            <th width="15%" class="sortable" ng-click="fieldSortColumn = 'score'"
+                ng-class="{active: fieldSortColumn == 'score'}">
+                Score
+            </th>
+            <th width="15%" class="txt-right">
+                Actions
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="group in groups | filter: fieldFilter.filter | orderBy: fieldSortColumn"
+            id="scenario.name-{[$index + 1]}">
+            <td>{[ group.id ]}-{[ group.groupName ]}</td>
+            <td>---</td>
+            <td>---</td>
+            <td class="actions txt-right">
+                <a class="no-border" title="edit ESP" ng-click="openModal('editGroup', group)">
+                    <i class="fa fa-edit fa-lg"></i>
+                </a>
+                <a class="no-border" title="delete ESP" ng-click="openModal('removeGroup', group)">
+                    <i class="fa fa-trash-o fa-lg"></i>
+                </a>
+            </td>
+        </tr>
+        <tr ng-repeat="field in fields | filter: fieldFilter.filter | orderBy: fieldSortColumn"
+            id="scenario.group-{[$index + 1]}">
+            <td>{[ field.xpath ]}</td>
+            <td>{[ field.data ]}</td>
+            <td>{[ field.score ]}</td>
+            <td class="actions txt-right">
+                <a class="no-border" title="edit ESP" ng-click="openModal('editField', field)">
+                    <i class="fa fa-edit fa-lg"></i>
+                </a>
+                <a class="no-border" title="delete ESP" ng-click="openModal('removeField', field)">
+                    <i class="fa fa-trash-o fa-lg"></i>
+                </a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
 <span class="txt-center" ng-hide="selectedScenario != ''"><h2>Select a scenario to see its ESPs</h2></span>
 <span class="txt-center" ng-show="selectedScenario != '' && fields == ''"><h2>The selected scenario does not have any fields</h2></span>

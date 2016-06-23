@@ -4,11 +4,11 @@ angular.module("myApp").factory('groupsFactory', ['$http', function ($http) {
         getGroupList: function () {
             return $http.get("get_groups")
         },
-        createGroup: function (scenarioData) {
-            return $http.post("create_group", scenarioData)
+        addGroup: function (scenarioData) {
+            return $http.post("add_group", scenarioData)
         },
-        deleteGroup: function (scenarioData) {
-            return $http.post("delete_group", scenarioData)
+        removeGroup: function (scenarioData) {
+            return $http.post("remove_group", scenarioData)
         },
         copyGroup: function (scenarioData) {
             return $http.post("copy_group", scenarioData)

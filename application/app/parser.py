@@ -20,13 +20,14 @@ class Parser:
                 Parser.data_tree = etree.parse(xml_file, parsing)
 
             except XMLSyntaxError:
-                return '', 'There was a problem parsing %s. Please report a bug if issue cannot be resolved from the following: insert weblink to help page' % file_name
+                return '', 'There was a problem parsing %s. Please report a bug if issue cannot be resolved from the' \
+                           ' following: ( TODO: insert web link to help page)' % file_name
 
         # Parser.doc_root = Parser.data_tree.getroot()
         etree.tostring(Parser.data_tree.getroot())
 
-        # treat nodes as nodes in a tree - only visit each node once, so that the same node doesn't get added to the scenario
-        # in more than one place
+        # treat nodes as nodes in a tree - only visit each node once,
+        #  so that the same node doesn't get added to the scenario in more than one place
         # in order to accomplish this, give each node a "visited" attribute before processing starts
         nodes = Parser.data_tree.iter()
         for n in nodes:
@@ -43,19 +44,20 @@ class Parser:
                     try:
                         score = int(node.attrib['score'])
                         score_is_number = True
-                    except:
-                        error += '\nline %s: invalid score for %s' % (node.sourceline, node.tag)
+                    except ValueError:
+                        error += '\n line %s: invalid score for %s' % (node.sourceline, node.tag)
                         score_is_number = False
                     if score < 1 or score > 5 and score_is_number:
-                        error += '\nline %s: invalid score for %s' % (node.sourceline, node.tag)
+                        error += '\n line %s: invalid score for %s' % (node.sourceline, node.tag)
                 else:
-                    error += '\nline %s: missing score for %s' % (node.sourceline, node.tag)
+                    error += '\n line %s: missing score for %s' % (node.sourceline, node.tag)
 
         print(error)
         if error:
             return "", error
 
-        # if the first child node of this node is a leaf, then we have the parent of a group of leaves/fields, process this group
+        # if the first child node of this node is a leaf, then we have
+        # the parent of a group of leaves/fields, process this group
         nodes = Parser.data_tree.iter()
         for node in nodes:
             if len(node) > 1:
@@ -63,8 +65,10 @@ class Parser:
 
         return Parser.esp_data_list, error
 
-    # method to check through a "parent" node from the document to see whether there are any important relationships to define
+    # method to check through a "parent" node from the document to see whether
+    # there are any important relationships to define
     # eg qualified repetition of a group or 2+ fields that are equivalent, such as LineItem.VPN and LineItem.BPN
+    @staticmethod
     def process_node(parent_node):
         for child in parent_node.getchildren():
             if len(child) < 1:
@@ -77,27 +81,29 @@ class Parser:
     # and required data
     # parameters: string xpath, string node.text
     # returns: dict
+    @staticmethod
     def check_required_data(xpath, node):
         data = node.text
         path = re.sub("\[(.*)]", "", xpath)
         score = node.attrib['score']
         return {'xpath': path, 'score': score, 'data': data}
 
-    # input_parse parses an xml file that is given as input, so it gets all the xpaths of all the nodes and checks to see
+    # input_parse parses an xml file that is given as input,
+    #  so it gets all the xpaths of all the nodes and checks to see
     # whether each field has data. It returns a list of all the xpaths in the input file (whether they have data or not)
     # plus a separate list of xpaths that do not have data so that can be added to the output file.
     @staticmethod
     def input_parse(file_name):
         xpath_list = {}
         empty_nodes = []
-        xml = open(file_name)
+        fxml = open(file_name)
         parser = etree.XMLParser(ns_clean=True)
         try:
-            tree = etree.parse(xml, parser)
+            tree = etree.parse(fxml, parser)
 
         except XMLSyntaxError:
             return "Error", "There was a problem parsing %s." % file_name
-        xml.close()
+        fxml.close()
         etree.tostring(tree.getroot())
 
         for node in tree.iter():

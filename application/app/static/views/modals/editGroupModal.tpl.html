@@ -6,20 +6,8 @@
     <li>
       <div>
         <label class="required">
-          Xpath
-          <input type="text" autofocus placeHolder="enter a new xpath..." ng-model="newScenario.xpath">
-        </label>
-      </div>
-      <div>
-        <label class="required">
-          Score
-          <input type="text" placeHolder="enter a score..." ng-model="newScenario.score">
-        </label>
-      </div>
-      <div>
-        <label>
-          Data
-          <input type="text" placeHolder="enter a data..." ng-model="newScenario.data">
+          Name
+          <input type="text" autofocus placeHolder="enter a new name..." ng-model="newScenario.groupName">
         </label>
       </div>
     </li>
@@ -33,7 +21,7 @@
     </li>
     <li>
       <button class="confirm" ng-click="closeModal()"
-      ng-disabled="!newScenario.xpath || !newScenario.score">
+      ng-disabled="!newScenario.groupName">
         Finish
       </button>
     </li>

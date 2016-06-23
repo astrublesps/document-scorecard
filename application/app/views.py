@@ -66,8 +66,8 @@ def upload_new_scenario():
         if is_valid:
             esps = input_data
             result, creating_scenario_error = scenarios.Scenario.create_scenario(name, schema, description, doctype,
-                                                                                 fulfillmenttype, esps)
-            if len(creating_scenario_error) > 0:
+                                                                                 fulfillmenttype, '', esps)
+            if result is False:
                 return make_response(creating_scenario_error, 400)
         return get_scenarios()
 
@@ -76,7 +76,6 @@ def upload_new_scenario():
 @app.route('/create_scenario', methods=['POST'])
 def create_scenario():
     if request.method == 'POST':
-        error = ""
         name = request.json['name']
         if 'schema' in request.json:
             schema = request.json['schema']
@@ -88,10 +87,14 @@ def create_scenario():
             fulfillmenttype = request.json['fulfillmentType']
         else:
             fulfillmenttype = ''
+        if 'rootName' in request.json:
+            root_name = request.json['rootName']
+        else:
+            root_name = ''
         result, create_error = scenarios.Scenario.create_scenario(name, schema, description, doctype, fulfillmenttype,
-                                                                  [])
+                                                                  root_name, [])
         if result is False:
-            return make_response(error, 400)
+            return make_response(create_error, 400)
         return get_scenarios()
 
 
@@ -145,28 +148,68 @@ def edit_scenario():
         return get_scenarios()
 
 
-# returns a list of esps to the webpage when the scenario is initially clicked to load the esps
-@app.route('/get_esps', methods=['POST'])
-def get_esps():
+# ----------------------------------GROUP FUNCTIONS-----------------------------------------------
+
+# adds a single group to a specified scenario
+@app.route('/add_group', methods=['POST'])
+def add_group():
+    if request.method == 'POST':
+        scen_name = request.json['scenName']
+        group_name = request.json['groupName']
+        result, group_error = scenarios.Scenario.add_group(scen_name, group_name)
+        if result is False:
+            return make_response(group_error, 500)
+        return field_list(scen_name)
+
+
+# edit a single group to a specified scenario
+@app.route('/edit_group', methods=['POST'])
+def edit_group():
+    if request.method == 'POST':
+        scen_name = request.json['scenName']
+        group_id = request.json['groupID']
+        group_name = request.json['groupName']
+        result, group_error = scenarios.Scenario.edit_group(group_id)
+        if result is False:
+            return make_response(group_error, 500)
+        return field_list(scen_name)
+
+
+# remove a single group to a specified scenario
+@app.route('/remove_group', methods=['POST'])
+def remove_group():
+    if request.method == 'POST':
+        scen_name = request.json['scenName']
+        group_id = request.json['groupID']
+        result, group_error = scenarios.Scenario.remove_group(scen_name, group_id)
+        if result is False:
+            return make_response(group_error, 500)
+        return field_list(scen_name)
+
+
+# ----------------------------------FIELD FUNCTIONS-----------------------------------------------
+
+# returns a list of esps to the webpage when the scenario is initially clicked to load the fields
+@app.route('/get_fields', methods=['POST'])
+def get_fields():
     if request.method == 'POST':
         name = request.json['name']
-        return esp_list(name)
+        return field_list(name)
 
 
-@app.route('/get_esps2', methods=['POST'])
-def get_esps2():
+@app.route('/get_fields2', methods=['POST'])
+def get_fields2():
     if request.method == 'POST':
         scen_name = request.json['name']
         return output.Output.get_scenario_as_xml_tree(scen_name)
 
 
-# returns a list of esps
-def esp_list(name):
-    exists = models.Scenario.check_exists(name)
+# returns a list of fields grouped by the groups they are in
+def field_list(name):
+    exists = models.Scenario.scenario_exists(name)
     if exists:
-        scen = models.Scenario.get_scenario(name)
-        scen_esps = scen.get_esps_as_list()
-        return Response(json.dumps(scen_esps), mimetype='application/json')
+        scenario_fields = scenarios.Scenario.get_fields(name)
+        return Response(json.dumps(scenario_fields), mimetype='application/json')
     else:
         return make_response('That scenario does not exist', 400)
 
@@ -186,8 +229,8 @@ def check_score(score):
 
 
 # adds a single given esp to a specified scenario
-@app.route('/add_esp', methods=['POST'])
-def add_esp():
+@app.route('/add_field', methods=['POST'])
+def add_field():
     if request.method == 'POST':
         scen_name = request.json['scenName']
         xpath = request.json['xpath']
@@ -200,12 +243,12 @@ def add_esp():
             return make_response(check_score_error, 500)
         if not scenarios.Scenario.add_esp(scen_name, xpath, score, data):
             return make_response('Scenario %s no longer exists' % scen_name, 500)
-        return esp_list(scen_name)
+        return field_list(scen_name)
 
 
 # removes one esp from a particular scenario
-@app.route('/remove_esp', methods=['POST'])
-def remove_esp():
+@app.route('/remove_field', methods=['POST'])
+def remove_field():
     if request.method == 'POST':
         scen_name = request.json['scenName']
         xpath = request.json['xpath']
@@ -214,12 +257,12 @@ def remove_esp():
         result, remove_error = scenarios.Scenario.remove_esp(scen_name, xpath, data, score)
         if result is False:
             return make_response(remove_error, 500)
-        return esp_list(scen_name)
+        return field_list(scen_name)
 
 
 # removes one esp from a particular scenario
-@app.route('/edit_esp', methods=['POST'])
-def edit_esp():
+@app.route('/edit_field', methods=['POST'])
+def edit_field():
     if request.method == 'POST':
         scen_name = request.json['scenName']
         old_xpath = request.json['oldXpath']
@@ -243,7 +286,7 @@ def edit_esp():
         result, edit_error = scenarios.Scenario.edit_esp(scen_name, old_xpath, old_data, old_score, xpath, data, score)
         if result is False:
             return make_response(edit_error, 500)
-        return esp_list(scen_name)
+        return field_list(scen_name)
 
 
 # The most important function of the application. Uploads an input file, checks to see if it's the right kind of file,

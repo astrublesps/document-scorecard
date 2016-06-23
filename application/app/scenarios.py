@@ -7,23 +7,28 @@ class Scenario:
     def get_scenarios():
         reformat_list = []
         scen_list = models.Scenario.get_scenarios()
-        for data in scen_list:
+        for scenario in scen_list:
             reformat_list.append(
-                {'name': data.name, 'schema': data.schema, 'description': data.description, 'doctype': data.doctype,
-                 'fulfillmenttype': data.fulfillmenttype, 'date_created': data.date_created,
-                 'date_updated': data.date_updated})
+                {'name': scenario.name, 'schema': scenario.schema, 'description': scenario.description,
+                 'doctype': scenario.doctype, 'fulfillmenttype': scenario.fulfillmenttype,
+                 'root_node': scenario.root_node,
+                 'date_created': scenario.date_created, 'date_updated': scenario.date_updated})
         return reformat_list
 
     @staticmethod
-    def exists(name):
-        return models.Scenario.check_exists(name)
+    def get_scenario(scen_name):
+        return models.Scenario.get_scenario(scen_name)
 
     @staticmethod
-    def create_scenario(name, schema, description, doctype, fulfillmenttype, esps):
+    def exists(name):
+        return models.Scenario.scenario_exists(name)
+
+    @staticmethod
+    def create_scenario(name, schema, description, doctype, fulfillmenttype, root_node, esps):
         # print('%r %r %r %r %r %r' % (name, schema, description, doctype, fulfillmenttype, esps))
         name_available = not Scenario.exists(name)
         if name_available:
-            scenario = models.Scenario.create_scenario(name, schema, description, doctype, fulfillmenttype)
+            scenario = models.Scenario.create_scenario(name, schema, description, doctype, fulfillmenttype, root_node)
             if scenario is not None:
                 print(esps)
                 for esp in esps:
@@ -76,14 +81,55 @@ class Scenario:
         else:
             return False, '%s already exists as a scenario' % new_name
 
+    # ----------------------------------GROUP FUNCTIONS-----------------------------------------------
+
     @staticmethod
-    def add_esp(scen_name, xpath, score, data):
+    def get_groups(scen_name):
+        scenario = Scenario.get_scenario(scen_name)
+        return models.Scenario.get_groups(scenario)
+
+    @staticmethod
+    def group_exists(scen_name):
+        scenario = Scenario.get_scenario(scen_name)
+        return True, models.Scenario.group_exists(scenario)
+
+    @staticmethod
+    def add_group(scen_name, group_name):
+        scenario = models.Scenario.get_scenario(scen_name)
+        return True, scenario.public_add_group(scen_name, group_name)
+
+    @staticmethod
+    def edit_group(group_id, group_name):
+        group = models.Group.get_group(group_id)
+        return True, group.edit_group(group_name)
+
+    @staticmethod
+    def remove_group(scen_name, group_id):
+        # scenario = Scenario.get_scenario(scen_name)
+        # group = models.Group.remove_group(group_id)
+        return True, models.Scenario.public_remove_group(scen_name, group_id)
+
+    # ----------------------------------FIELD FUNCTIONS-----------------------------------------------
+
+    @staticmethod
+    def get_fields(scen_name):
+        field_list = []
+        groups = Scenario.get_groups(scen_name)
+        print(groups)
+        for group in groups:
+            print(group)
+            # field_list.append(group.get_fields())
+            field_list.append({'id': group.id, 'groupName': group.name})
+        return field_list
+
+    @staticmethod
+    def add_field(scen_name, xpath, score, data):
         return models.Scenario.public_add_esp(scen_name, xpath, score, data)
 
     @staticmethod
-    def remove_esp(scen_name, xpath, score, data):
+    def remove_field(scen_name, xpath, score, data):
         return models.Scenario.public_remove_esp(scen_name, xpath, score, data)
 
     @staticmethod
-    def edit_esp(scen_name, old_xpath, old_data, old_score, xpath, data, score):
+    def edit_field(scen_name, old_xpath, old_data, old_score, xpath, data, score):
         return models.Scenario.edit_esp(scen_name, old_xpath, old_data, old_score, xpath, data, score)
