@@ -1,0 +1,41 @@
+<div id="create-field-modal" class="reveal-modal open" data-reveal tabindex="0" aria-hidden="false"
+     style="display: block; opacity: 1; visibility: visible; top: 100px; max-height: 500px">
+    <header class="modal-title">
+        Create a field
+    </header>
+    Adding a new field to {[ scenario.name ]}
+    <ul class="fa-ul">
+        <li>
+            <div>
+                <label class="required">
+                    Xpath
+                    <input type="text" placeHolder="enter a new xpath..." ng-model="newScenario.xpath">
+                </label>
+            </div>
+            <div>
+                <label class="required">
+                    Score
+                    <input type="text" placeHolder="enter a new score (1-5, 5 = most important)..."
+                           ng-model="newScenario.score">
+                </label>
+            </div>
+            <div>
+                <label>
+                    Data
+                    <input type="text" placeHolder="enter a new data..." ng-model="newScenario.data">
+                </label>
+            </div>
+        </li>
+    </ul>
+    <ul class="form-actions">
+        <li>
+            <button class="button" ng-click="cancelModal()">Cancel</button>
+        </li>
+        <li>
+            <button class="confirm" ng-click="closeModal()" ng-disabled="!newScenario.xpath || !newScenario.score">
+                Finish
+            </button>
+        </li>
+    </ul>
+    <a class="close-reveal-modal" ng-click="cancelModal()">x</a>
+</div>
