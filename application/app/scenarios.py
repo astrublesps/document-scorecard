@@ -9,15 +9,15 @@ class Scenario:
         scen_list = models.Scenario.get_scenarios()
         for scenario in scen_list:
             reformat_list.append(
-                {'name': scenario.name, 'schema': scenario.schema, 'description': scenario.description,
+                {'scenId': scenario.id, 'name': scenario.name, 'schema': scenario.schema, 'description': scenario.description,
                  'doctype': scenario.doctype, 'fulfillmenttype': scenario.fulfillmenttype,
                  'root_node': scenario.root_node,
                  'date_created': scenario.date_created, 'date_updated': scenario.date_updated})
         return reformat_list
 
     @staticmethod
-    def get_scenario(scen_name):
-        return models.Scenario.get_scenario(scen_name)
+    def get_scenario(scen_id):
+        return models.Scenario.get_scenario(scen_id)
 
     @staticmethod
     def exists(name):
@@ -49,8 +49,8 @@ class Scenario:
         return True, ''
 
     @staticmethod
-    def delete_scenario(name):
-        return models.Scenario.delete_scenario(name)
+    def delete_scenario(scen_id):
+        return models.Scenario.delete_scenario(scen_id)
 
     @staticmethod
     def copy_scenario(old_name, new_name, new_description):
@@ -71,10 +71,10 @@ class Scenario:
             return False, '%s already exists as a scenario' % new_name
 
     @staticmethod
-    def edit_scenario(old_name, new_name, schema, description, doctpye, fulfillmenttype):
+    def edit_scenario(old_name, new_name, schema, description, docttpye, fulfillmenttype):
         if old_name == new_name or (not Scenario.exists(new_name) and Scenario.exists(old_name)):
             scenario = models.Scenario.get_scenario(old_name)
-            scenario.edit(new_name, schema, description, doctpye, fulfillmenttype)
+            scenario.edit(new_name, schema, description, docttpye, fulfillmenttype)
             return True, ''
         elif not Scenario.exists(old_name):
             return False, '%s no longer exists as a scenario' % old_name
@@ -84,8 +84,9 @@ class Scenario:
     # ----------------------------------GROUP FUNCTIONS-----------------------------------------------
 
     @staticmethod
-    def get_groups(scen_name):
-        scenario = Scenario.get_scenario(scen_name)
+    def get_groups(scen_id):
+        print('get_groups')
+        scenario = Scenario.get_scenario(scen_id)
         return models.Scenario.get_groups(scenario)
 
     @staticmethod
@@ -94,9 +95,8 @@ class Scenario:
         return True, models.Scenario.group_exists(scenario)
 
     @staticmethod
-    def add_group(scen_name, group_name):
-        scenario = models.Scenario.get_scenario(scen_name)
-        return True, scenario.public_add_group(scen_name, group_name)
+    def add_group(scen_id, group_name):
+        return True, models.Scenario.public_add_group(scen_id, group_name)
 
     @staticmethod
     def edit_group(group_id, group_name):
@@ -105,30 +105,29 @@ class Scenario:
 
     @staticmethod
     def remove_group(scen_name, group_id):
-        # scenario = Scenario.get_scenario(scen_name)
-        # group = models.Group.remove_group(group_id)
         return True, models.Scenario.public_remove_group(scen_name, group_id)
 
     # ----------------------------------FIELD FUNCTIONS-----------------------------------------------
 
     @staticmethod
-    def get_fields(scen_name):
+    def get_fields(scen_id):
         field_list = []
-        groups = Scenario.get_groups(scen_name)
+        groups = Scenario.get_groups(scen_id)
         print(groups)
         for group in groups:
             print(group)
             # field_list.append(group.get_fields())
-            field_list.append({'id': group.id, 'groupName': group.name})
+            field_list.append({'groupId': group.id, 'groupName': group.name})
         return field_list
 
     @staticmethod
-    def add_field(scen_name, xpath, score, data):
-        return models.Scenario.public_add_esp(scen_name, xpath, score, data)
+    def add_field(group_id, name, score, data, not_equal):
+        group = models.Group.get_group(group_id)
+        return group.add_field(name, score, data, not_equal)
 
     @staticmethod
     def remove_field(scen_name, xpath, score, data):
-        return models.Scenario.public_remove_esp(scen_name, xpath, score, data)
+        return models.Scenario.public_remove_(scen_name, xpath, score, data)
 
     @staticmethod
     def edit_field(scen_name, old_xpath, old_data, old_score, xpath, data, score):

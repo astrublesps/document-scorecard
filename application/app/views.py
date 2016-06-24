@@ -102,11 +102,11 @@ def create_scenario():
 @app.route('/delete_scenario', methods=['POST'])
 def delete_scenario():
     if request.method == 'POST':
-        name = request.json['name']
-        if not scenarios.Scenario.exists(name):
-            return make_response("Scenario %s does not exist" % name, 400)
-        if not scenarios.Scenario.delete_scenario(name):
-            return make_response("Unable to delete scenario %s" % name, 400)
+        scen_id = request.json['scenID']
+        if not scenarios.Scenario.exists(scen_id):
+            return make_response("Scenario does not exist", 400)
+        if not scenarios.Scenario.delete_scenario(scen_id):
+            return make_response("Unable to delete scenario", 400)
         return get_scenarios()
 
 
@@ -154,37 +154,37 @@ def edit_scenario():
 @app.route('/add_group', methods=['POST'])
 def add_group():
     if request.method == 'POST':
-        scen_name = request.json['scenName']
+        scen_id = request.json['scenID2']
         group_name = request.json['groupName']
-        result, group_error = scenarios.Scenario.add_group(scen_name, group_name)
+        result, group_error = scenarios.Scenario.add_group(scen_id, group_name)
         if result is False:
             return make_response(group_error, 500)
-        return field_list(scen_name)
+        return field_list(scen_id)
 
 
 # edit a single group to a specified scenario
 @app.route('/edit_group', methods=['POST'])
 def edit_group():
     if request.method == 'POST':
-        scen_name = request.json['scenName']
+        scen_id = request.json['scenID2']
         group_id = request.json['groupID']
         group_name = request.json['groupName']
-        result, group_error = scenarios.Scenario.edit_group(group_id)
+        result, group_error = scenarios.Scenario.edit_group(group_id, group_name)
         if result is False:
             return make_response(group_error, 500)
-        return field_list(scen_name)
+        return field_list(scen_id)
 
 
-# remove a single group to a specified scenario
+# remove a single group from a specified scenario
 @app.route('/remove_group', methods=['POST'])
 def remove_group():
     if request.method == 'POST':
-        scen_name = request.json['scenName']
+        scen_id = request.json['scenID2']
         group_id = request.json['groupID']
-        result, group_error = scenarios.Scenario.remove_group(scen_name, group_id)
+        result, group_error = scenarios.Scenario.remove_group(scen_id, group_id)
         if result is False:
             return make_response(group_error, 500)
-        return field_list(scen_name)
+        return field_list(scen_id)
 
 
 # ----------------------------------FIELD FUNCTIONS-----------------------------------------------
@@ -193,24 +193,27 @@ def remove_group():
 @app.route('/get_fields', methods=['POST'])
 def get_fields():
     if request.method == 'POST':
-        name = request.json['name']
-        return field_list(name)
+        scen_id = request.json['scenID']
+        return field_list(scen_id)
 
 
 @app.route('/get_fields2', methods=['POST'])
 def get_fields2():
     if request.method == 'POST':
-        scen_name = request.json['name']
-        return output.Output.get_scenario_as_xml_tree(scen_name)
+        scen_id = request.json['scenID']
+        return output.Output.get_scenario_as_xml_tree(scen_id)
 
 
 # returns a list of fields grouped by the groups they are in
-def field_list(name):
-    exists = models.Scenario.scenario_exists(name)
+def field_list(scen_id):
+    exists = models.Scenario.scenario_exists(scen_id)
+    print(exists)
     if exists:
-        scenario_fields = scenarios.Scenario.get_fields(name)
+        print('exists')
+        scenario_fields = scenarios.Scenario.get_fields(scen_id)
         return Response(json.dumps(scenario_fields), mimetype='application/json')
     else:
+        print('-------------------------'+scen_id)
         return make_response('That scenario does not exist', 400)
 
 
@@ -233,7 +236,8 @@ def check_score(score):
 def add_field():
     if request.method == 'POST':
         scen_name = request.json['scenName']
-        xpath = request.json['xpath']
+        group_name = request.json['groupName']
+        name = request.json['fieldName']
         score = request.json['score']  # is an int
         data = ''
         if 'data' in request.json:
@@ -241,7 +245,7 @@ def add_field():
         result, check_score_error = check_score(score)
         if result is False:
             return make_response(check_score_error, 500)
-        if not scenarios.Scenario.add_esp(scen_name, xpath, score, data):
+        if not scenarios.Scenario.add_field(scen_name, group_name, name, score, data):
             return make_response('Scenario %s no longer exists' % scen_name, 500)
         return field_list(scen_name)
 

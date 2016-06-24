@@ -7,7 +7,6 @@ from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.script import Manager
 from flask.ext.migrate import Migrate, MigrateCommand
 
-
 # this info is used to migrate and update the database tables
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
@@ -49,19 +48,25 @@ class Field(db.Model):
 
     # Check to see whether a field is already in the database
     @staticmethod
-    def field_exists(name, score, data, not_equal):
-        return Field.query.filter(Field.name == name, Field.score == score,
-                                  Field.data == data, Field.not_equal == not_equal).first() is not None
+    def field_exists(field_id):
+        return Field.query.filter(Field.id == field_id).first() is not None
 
-    # Return a field given its name, score, data, and not_equal boolean
+    # Return a field given its id
     @staticmethod
-    def get_field(name, score, data, not_equal):
-        return Field.query.filter(Field.name == name, Field.score == score, Field.data == data,
-                                  Field.not_equal == not_equal).first()
+    def get_field(field_id):
+        if Field.field_exists(field_id):
+            return Field.query.filter(Field.id == field_id).first()
 
     # remove a particular esp from the database
-    def delete_field(self, name):
-        field = Field.query.filter_by(self.name == name)
+    @staticmethod
+    def add_field(name, score, data, not_equal):
+        field = Field(name, score, data, not_equal)
+        db.session.delete(field)
+        db.session.commit()
+
+    @staticmethod
+    def delete_field(field_id):
+        field = Field.get_field(field_id)
         db.session.delete(field)
         db.session.commit()
 
@@ -74,7 +79,8 @@ class Field(db.Model):
         return {'id': self.id,
                 'name': self.name,
                 'score': self.score,
-                'data': self.data
+                'data': self.data,
+                'not_equal': self.not_equal
                 }
 
 
@@ -85,8 +91,8 @@ class Group(db.Model):
     name = db.Column(db.String(500), index=True)
     qualifier_field = db.Column(db.String(100))
     scenario_groups = db.relationship('Group', secondary=scenario_groups,
-                                   primaryjoin=(scenario_groups.c.group_id == id),
-                                   backref=db.backref('groups', lazy='dynamic'))
+                                      primaryjoin=(scenario_groups.c.group_id == id),
+                                      backref=db.backref('groups', lazy='dynamic'))
     child_fields = db.relationship('Field', secondary=group_fields,
                                    primaryjoin=(group_fields.c.group_id == id),
                                    backref=db.backref('fields', lazy='dynamic'))
@@ -130,12 +136,14 @@ class Group(db.Model):
     def get_fields(self):
         return Group.query.join(group_fields).filter(group_fields.c.group_id == self.id).first()
 
-    def add_field(self, field):
+    def add_field(self, name, score, data, not_equal):
+        field = Field(name, score, data, not_equal)
         self.group_fields.append(field)
         db.session.commit()
         return field
 
-    def remove_field(self, field):
+    def remove_field(self, field_id):
+        field = Field.get_field(field_id)
         self.esps.remove(field)
         db.session.commit()
 
@@ -166,8 +174,8 @@ class Scenario(db.Model):
     date_updated = db.Column(db.DateTime)
     root_node = db.Column(db.String(200))
     scenario_groups = db.relationship('Group', secondary=scenario_groups,
-                                   primaryjoin=(scenario_groups.c.scenario_id == id),
-                                   backref=db.backref('scenarios', lazy='dynamic'))
+                                      primaryjoin=(scenario_groups.c.scenario_id == id),
+                                      backref=db.backref('scenarios', lazy='dynamic'))
 
     def __init__(self, name, schema, description, doctype, fulfillmenttype, root_node):
         if not Scenario.scenario_exists(name):
@@ -182,14 +190,14 @@ class Scenario(db.Model):
 
     # Check to see if a scenario exists, given its name
     @staticmethod
-    def scenario_exists(check_name):
-        return Scenario.query.filter_by(name=check_name).first() is not None
+    def scenario_exists(scen_id):
+        return Scenario.query.filter_by(id=scen_id).first() is not None
 
-    # Get a particular scenario from the database, given its name
+    # Get a particular scenario from the database, given its id
     @staticmethod
-    def get_scenario(scen_name):
-        if Scenario.scenario_exists(scen_name):
-            return Scenario.query.filter_by(name=scen_name).first()
+    def get_scenario(scen_id):
+        if Scenario.scenario_exists(scen_id):
+            return Scenario.query.filter_by(id=scen_id).first()
 
     # Return groups (which will return fields) related to a specific scenario so that they can be manipulated
     # Used in the Compare and ScenarioList classes
@@ -198,7 +206,7 @@ class Scenario(db.Model):
             asc(Group.name)).all()
 
     # Return a particular esp related to a specific scenario
-    def get_single_group_for_scen(self,group_id):
+    def get_single_group_for_scen(self, group_id):
         return Group.query.join(scenario_groups).filter(scenario_groups.c.scenario_id == self.id,
                                                         Group.id == group_id).first()
 
@@ -215,13 +223,13 @@ class Scenario(db.Model):
 
     # Method to check that a scenario exists, delete, and commit the change
     @staticmethod
-    def delete_scenario(name):
-        if Scenario.scenario_exists(name):
-            del_scen = Scenario.get_scenario(name)
-            esps_to_delete = Group.query.join(scenario_groups).filter(
+    def delete_scenario(scen_id):
+        if Scenario.scenario_exists(scen_id):
+            del_scen = Scenario.get_scenario(scen_id)
+            groups_to_delete = Group.query.join(scenario_groups).filter(
                 scenario_groups.c.scenario_id == del_scen.id).all()
-            for esp in esps_to_delete:
-                del_scen.remove_esp(esp)
+            for group in groups_to_delete:
+                del_scen.remove_group(group)
             db.session.delete(del_scen)
             db.session.commit()
             return True
@@ -241,20 +249,17 @@ class Scenario(db.Model):
     # Method to take most of the finicky stuff out of adding an esp - just pass in the name of the scenario, the
     # name of the esp, and its score, and the method will take care of all the checks and things
     @staticmethod
-    def public_add_group(scen_name, group_name):
-        if Scenario.scenario_exists(scen_name):
-            scen = Scenario.get_scenario(scen_name)
-            if Group.group_exists(group_name):
-                curr = Group.get_group(group_name)
-            else:
-                curr = Group(group_name, '')
-            group = scen.add_group(curr)
+    def public_add_group(scen_id, group_name):
+        if Scenario.scenario_exists(scen_id):
+            scen = Scenario.get_scenario(scen_id)
+            new_group = Group(group_name, '')
+            group = scen.add_group(new_group)
             if group:
                 return True, group
             else:
-                return False, 'Unable to add group %s to scenario %s' % (group_name, scen_name)
+                return False, 'Unable to add group %s to scenario %s' % (group_name, scen.name)
         else:
-            return False, '%s no longer exists as a scenario' % scen_name
+            return False, 'The chosen scenario no longer exists, please refresh the page and try again'
 
     # Method to take the work out of removing an esp from a scenario- pass in the scenario name and the name of the esp
     # to remove. The method runs a query to get the specific esp that is related to the given scenario and then removes

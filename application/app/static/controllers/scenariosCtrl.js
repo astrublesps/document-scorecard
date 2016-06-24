@@ -1,6 +1,6 @@
 angular.module("myApp").controller("scenariosCtrl", scenariosCtrl);
 
-scenariosCtrl.$inject = ["$scope", "scenariosFactory","groupsFactory", "fieldsFactory", "schemasFactory", "feedbackService", "$uibModal"];
+scenariosCtrl.$inject = ["$scope", "scenariosFactory", "groupsFactory", "fieldsFactory", "schemasFactory", "feedbackService", "$uibModal"];
 function scenariosCtrl($scope, scenariosFactory, groupsFactory, fieldsFactory, schemasFactory, feedbackService, $uibModal) {
     //initiate local variables for tableCtrl
     $scope.scenarios = [];
@@ -72,27 +72,27 @@ function scenariosCtrl($scope, scenariosFactory, groupsFactory, fieldsFactory, s
                 .result.then(function (result) { //this happens when the modal is closed, not dismissed
                 var jsonData = (JSON.stringify({
                     //----------SCENARIO-------------------------------
-                    name: result.scenario.name,
+                    name: result.scenario.scenName,
                     schema: result.scenario.schema,
                     description: result.scenario.description,
                     docType: result.scenario.doctype,
                     fulfillmentType: result.scenario.fulfillmenttype,
                     rootName: result.scenario.rootName,
                     scenName: $scope.selectedScenario.name,
-                    oldName: scenario.name,
+                    oldScenName: scenario.name,
+                    scenID: result.scenario.scenId,
+                    scenID2: $scope.selectedScenario.scenId,
                     //----------GROUP----------------------------------
                     groupName: result.scenario.groupName,
-                    groupID: result.scenario.id,
+                    groupID: result.scenario.groupId,
                     //----------FIELD----------------------------------
-                    oldXpath: scenario.xpath,
+                    oldFieldName: scenario.xpath,
                     oldData: scenario.data,
                     oldScore: scenario.score,
-                    xpath: result.scenario.xpath,
+                    fieldName: result.scenario.xpath,
                     score: result.scenario.score,
                     data: result.scenario.data,
-                    newXpath: result.scenario.xpath,
-                    newScore: result.scenario.score,
-                    newData: result.scenario.data
+                    fieldID: result.scenario.fieldId
                 }));
 
                 //------------------------SCENARIOS-----------------------------------------
@@ -146,6 +146,7 @@ function scenariosCtrl($scope, scenariosFactory, groupsFactory, fieldsFactory, s
                         $scope.scenarios = data;
                         // empty fields table so it doesn't still show the deleted scenario
                         $scope.selectedScenario = '';
+                        $scope.groups = '';
                         $scope.fields = '';
                         feedbackService.addMessage('Scenario successfully deleted', '200');
                     })
@@ -165,7 +166,7 @@ function scenariosCtrl($scope, scenariosFactory, groupsFactory, fieldsFactory, s
                             console.log('error code: ' + status + '-' + result);
                         });
                 } else if (result.action == 'editGroup') {
-                   groupsFactory.editGroup(jsonData).success(function (data) {
+                    groupsFactory.editGroup(jsonData).success(function (data) {
                         $scope.groups = data;
                         feedbackService.addMessage('Field successfully edited', '200');
                     })
@@ -194,7 +195,7 @@ function scenariosCtrl($scope, scenariosFactory, groupsFactory, fieldsFactory, s
                             console.log('error code: ' + status + '-' + result);
                         });
                 } else if (result.action == 'editField') {
-                   fieldsFactory.editField(jsonData).success(function (data) {
+                    fieldsFactory.editField(jsonData).success(function (data) {
                         $scope.fields = data;
                         feedbackService.addMessage('Field successfully edited', '200');
                     })
@@ -255,7 +256,7 @@ function scenariosCtrl($scope, scenariosFactory, groupsFactory, fieldsFactory, s
         //get fields to populate fieldsTable
         if ($scope.selectedScenario != null && $scope.selectedScenario.name != null) {
             var jsonData = (JSON.stringify({
-                name: $scope.selectedScenario.name
+                scenID: $scope.selectedScenario.scenId
             }));
             if (!$scope.hideFieldsTable) {
                 fieldsFactory.getFieldList(jsonData).success(function (data) {
@@ -326,83 +327,5 @@ function scenariosCtrl($scope, scenariosFactory, groupsFactory, fieldsFactory, s
             });
         }
     }
-    $scope.selectedScenario = [{
-				"id": "1",
-				"name": "scenario1",
-				"description": "new test scenario",
-				"doc_type": "850",
-				"fullfillment_type": "dropship",
-				"schema": "PurchaseOrder-7.6",
-				"root_node": "Order",
-				"groups": [{
-						"id": "1",
-						"name": "Header",
-						"xpath": "/Order/Header",
-						"qualifier": "",
-						"child_groups": "OrderHeader|Date|Reference",
-						"fields": []
-				},
-				{
-						"id": "2",
-						"name": "OrderHeader",
-						"xpath": "/Order/Header/OrderHeader",
-						"qualifier": "",
-						"child_groups": "",
-						"fields": [{
-								"id": "1",
-								"name": "TradingPartnerId",
-								"score": "5",
-								"data": "TEST_TPID",
-								"not_equal": ""
-						},
-						{
-								"id": "2",
-								"name": "PurchaseOrderNumber",
-								"score": "5",
-								"data": "1234567890",
-								"not_equal": ""
-						}]
-				},
-				{
-						"id": "3",
-						"name": "Date",
-						"qualifier": "",
-						"child_groups": "",
-						"fields": [{
-								"id": "3",
-								"name": "DateTimeQualifier1",
-								"score": "5",
-								"data": "001",
-								"not_equal": ""
-						},
-						{
-								"id": "4",
-								"name": "Date",
-								"score": "5",
-								"data": "2016-05-15",
-								"not_equal": ""
-						}]
-				},
-				{
-						"id": "4",
-						"name": "Reference",
-						"qualifier": "",
-						"child_groups": "",
-						"fields": [{
-								"id": "5",
-								"name": "ReferenceQual",
-								"score": "5",
-								"data": "",
-								"not_equal": "ZZ"
-						},
-						{
-								"id": "6",
-								"name": "ReferenceID",
-								"score": "5",
-								"data": "1111",
-								"not_equal": ""
-						}]
-				}]
-		}]
 }
 
